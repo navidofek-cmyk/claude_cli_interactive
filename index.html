@@ -1,0 +1,2005 @@
+<!DOCTYPE html>
+<html lang="cs" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claude Code CLI – Kompletní tutoriál</title>
+  <meta name="description" content="Kompletní český tutoriál pro Claude Code CLI – od instalace po pokročilé multi-agent architektury." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>" />
+</head>
+<body>
+
+<!-- ─── PROGRESS BAR ─────────────────────────────── -->
+<div class="progress-bar" id="progress-bar" style="width:0%"></div>
+
+<!-- ─── OVERLAY (mobile) ─────────────────────────────── -->
+<div id="overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:49;"></div>
+
+<!-- ─── HEADER ─────────────────────────────── -->
+<header class="site-header">
+  <a class="logo" href="#" onclick="showSection('uvod');return false;">
+    <div class="logo-icon">🤖</div>
+    <span>Claude Code CLI</span>
+  </a>
+  <div class="header-actions">
+    <a href="https://github.com/navidofek-cmyk/claude_cli_interactive" target="_blank"
+       style="color:var(--text-muted);font-size:13px;text-decoration:none;display:flex;align-items:center;gap:5px;">
+      <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
+        0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13
+        -.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66
+        .07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15
+        -.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27
+        .68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12
+        .51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48
+        0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+      </svg>
+      GitHub
+    </a>
+    <button class="theme-btn" id="theme-btn">☀️ Světlý režim</button>
+    <button class="menu-btn" id="menu-btn">☰ Menu</button>
+  </div>
+</header>
+
+<!-- ─── LAYOUT ─────────────────────────────── -->
+<div class="layout">
+
+  <!-- ─── SIDEBAR ─────────────────────────────── -->
+  <nav class="sidebar">
+    <div class="search-wrap">
+      <input class="search-input" id="sidebar-search" type="text" placeholder="🔍 Hledat..." />
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Začínáme</div>
+      <a class="sidebar-link" data-section="uvod"><span class="emoji">🏠</span> Úvod</a>
+      <a class="sidebar-link" data-section="instalace"><span class="emoji">⚙️</span> Instalace</a>
+      <a class="sidebar-link" data-section="prvni-kroky"><span class="emoji">🚀</span> První kroky</a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Základní funkce</div>
+      <a class="sidebar-link" data-section="slash-prikazy"><span class="emoji">📟</span> Slash příkazy</a>
+      <a class="sidebar-link" data-section="klavesove-zkratky"><span class="emoji">⌨️</span> Klávesové zkratky</a>
+      <a class="sidebar-link" data-section="nastroje"><span class="emoji">🔧</span> Nástroje (Tools)</a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Konfigurace</div>
+      <a class="sidebar-link" data-section="claude-md"><span class="emoji">📝</span> CLAUDE.md</a>
+      <a class="sidebar-link" data-section="konfigurace"><span class="emoji">🛠️</span> settings.json</a>
+      <a class="sidebar-link" data-section="hooks"><span class="emoji">🪝</span> Hooks</a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Agenti & Paralelismus</div>
+      <a class="sidebar-link" data-section="agenti"><span class="emoji">🤖</span> Agent Tool</a>
+      <a class="sidebar-link" data-section="agent-nastaveni"><span class="emoji">⚙️</span> Nastavení agentů</a>
+      <a class="sidebar-link" data-section="paralelni-agenti"><span class="emoji">⚡</span> Paralelní agenti</a>
+      <a class="sidebar-link" data-section="multi-agent"><span class="emoji">🕸️</span> Multi-agent archit.</a>
+      <a class="sidebar-link" data-section="supervisor"><span class="emoji">👁️</span> Supervisor vzory</a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Pokročilé</div>
+      <a class="sidebar-link" data-section="mcp"><span class="emoji">🔌</span> MCP Servery</a>
+      <a class="sidebar-link" data-section="ide"><span class="emoji">💻</span> IDE Integrace</a>
+      <a class="sidebar-link" data-section="tipy"><span class="emoji">💡</span> Tipy a triky</a>
+    </div>
+  </nav>
+
+  <!-- ─── MAIN ─────────────────────────────── -->
+  <main class="main">
+    <div class="content">
+
+      <!-- ══════════════════════════════════════════════════════ -->
+      <!-- SEKCE: ÚVOD -->
+      <!-- ══════════════════════════════════════════════════════ -->
+      <section class="section" id="uvod">
+        <div class="page-header">
+          <div class="page-icon">🏠</div>
+          <div>
+            <h1>Claude Code CLI – Kompletní tutoriál</h1>
+            <p class="page-subtitle">Průvodce od instalace po pokročilé multi-agent architektury</p>
+          </div>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-icon">ℹ️</div>
+          <div class="callout-body">
+            <p><strong>Claude Code</strong> (dříve <em>Claude CLI</em>) je interaktivní nástroj příkazové řádky od Anthropic, který přímo integruje Claude do vašeho vývojového prostředí. Dokáže číst soubory, psát kód, spouštět příkazy, prohledávat web a koordinovat celé týmy AI agentů.</p>
+          </div>
+        </div>
+
+        <h2>Co se naučíte</h2>
+        <div class="overview-grid">
+          <div class="overview-item" data-target="instalace">
+            <div class="oi-emoji">⚙️</div>
+            <div class="oi-title">Instalace</div>
+            <div class="oi-desc">npm, přihlášení, ověření</div>
+          </div>
+          <div class="overview-item" data-target="slash-prikazy">
+            <div class="oi-emoji">📟</div>
+            <div class="oi-title">Slash příkazy</div>
+            <div class="oi-desc">/help, /clear, /compact…</div>
+          </div>
+          <div class="overview-item" data-target="nastroje">
+            <div class="oi-emoji">🔧</div>
+            <div class="oi-title">Nástroje</div>
+            <div class="oi-desc">Bash, Read, Edit, Write…</div>
+          </div>
+          <div class="overview-item" data-target="claude-md">
+            <div class="oi-emoji">📝</div>
+            <div class="oi-title">CLAUDE.md</div>
+            <div class="oi-desc">Instrukce pro projekt</div>
+          </div>
+          <div class="overview-item" data-target="hooks">
+            <div class="oi-emoji">🪝</div>
+            <div class="oi-title">Hooks</div>
+            <div class="oi-desc">Automatické akce</div>
+          </div>
+          <div class="overview-item" data-target="agenti">
+            <div class="oi-emoji">🤖</div>
+            <div class="oi-title">Agenti</div>
+            <div class="oi-desc">Agent tool, subagenti</div>
+          </div>
+          <div class="overview-item" data-target="agent-nastaveni">
+            <div class="oi-emoji">⚙️</div>
+            <div class="oi-title">Nastavení agentů</div>
+            <div class="oi-desc">Model, nástroje, prompty</div>
+          </div>
+          <div class="overview-item" data-target="paralelni-agenti">
+            <div class="oi-emoji">⚡</div>
+            <div class="oi-title">Paralelní agenti</div>
+            <div class="oi-desc">Souběžné zpracování</div>
+          </div>
+          <div class="overview-item" data-target="multi-agent">
+            <div class="oi-emoji">🕸️</div>
+            <div class="oi-title">Multi-agent</div>
+            <div class="oi-desc">Architektury a vzory</div>
+          </div>
+          <div class="overview-item" data-target="supervisor">
+            <div class="oi-emoji">👁️</div>
+            <div class="oi-title">Supervisor</div>
+            <div class="oi-desc">Orchestrace agentů</div>
+          </div>
+          <div class="overview-item" data-target="mcp">
+            <div class="oi-emoji">🔌</div>
+            <div class="oi-title">MCP Servery</div>
+            <div class="oi-desc">Rozšíření nástrojů</div>
+          </div>
+          <div class="overview-item" data-target="ide">
+            <div class="oi-emoji">💻</div>
+            <div class="oi-title">IDE Integrace</div>
+            <div class="oi-desc">VS Code, JetBrains</div>
+          </div>
+          <div class="overview-item" data-target="tipy">
+            <div class="oi-emoji">💡</div>
+            <div class="oi-title">Tipy a triky</div>
+            <div class="oi-desc">Best practices</div>
+          </div>
+        </div>
+
+        <h2>Proč Claude Code?</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Vlastnost</th><th>Claude Code CLI</th><th>Webový chat</th></tr></thead>
+            <tbody>
+              <tr><td>Přístup k souborům</td><td><span class="badge badge-green">✓ Přímý</span></td><td>Pouze upload</td></tr>
+              <tr><td>Spouštění příkazů</td><td><span class="badge badge-green">✓ Shell</span></td><td>✗</td></tr>
+              <tr><td>Kontext projektu</td><td><span class="badge badge-green">✓ Automatický</span></td><td>Ruční</td></tr>
+              <tr><td>Git integrace</td><td><span class="badge badge-green">✓ Nativní</span></td><td>✗</td></tr>
+              <tr><td>Agenti & paralelismus</td><td><span class="badge badge-green">✓ Plná podpora</span></td><td>✗</td></tr>
+              <tr><td>MCP rozšíření</td><td><span class="badge badge-green">✓ Konfigurovatelné</span></td><td>✗</td></tr>
+              <tr><td>Hooks & automatizace</td><td><span class="badge badge-green">✓ Plná</span></td><td>✗</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="nav-bottom">
+          <div id="nav-prev" class="nav-btn"></div>
+          <div id="nav-next" class="nav-btn next">
+            <div class="nav-label">Další →</div>
+            <div class="nav-title"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════ -->
+      <!-- SEKCE: INSTALACE -->
+      <!-- ══════════════════════════════════════════════════════ -->
+      <section class="section" id="instalace">
+        <div class="page-header">
+          <div class="page-icon">⚙️</div>
+          <div>
+            <h1>Instalace</h1>
+            <p class="page-subtitle">Potřebujete Node.js 18+ a API klíč od Anthropic</p>
+          </div>
+        </div>
+
+        <h2>Požadavky</h2>
+        <ul>
+          <li><strong>Node.js</strong> verze 18 nebo novější (<code>node --version</code>)</li>
+          <li><strong>npm</strong> (součást Node.js)</li>
+          <li><strong>Anthropic API klíč</strong> nebo přihlášení přes Claude.ai Pro/Max</li>
+        </ul>
+
+        <h2>Globální instalace</h2>
+        <pre><code><span class="prompt">$ </span>npm install -g @anthropic-ai/claude-code</code></pre>
+
+        <div class="callout callout-warn">
+          <div class="callout-icon">⚠️</div>
+          <div class="callout-body">
+            <p>Pokud dostanete chybu oprávnění na macOS/Linux, nepoužívejte <code>sudo</code>. Místo toho nastavte správně prefix npm: <code>npm config set prefix '~/.npm-global'</code> a přidejte <code>~/.npm-global/bin</code> do PATH.</p>
+          </div>
+        </div>
+
+        <h2>Přihlášení</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-content">
+              <h4>Spusťte Claude Code</h4>
+              <pre><code><span class="prompt">$ </span>claude</code></pre>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-content">
+              <h4>Zvolte způsob přihlášení</h4>
+              <p>Claude Code vám nabídne tři možnosti:</p>
+              <ul>
+                <li><strong>Claude.ai</strong> – přihlásíte se přes prohlížeč (Pro/Max plán)</li>
+                <li><strong>Anthropic API klíč</strong> – zadáte klíč přímo</li>
+                <li><strong>Bedrock / Vertex</strong> – cloudové deployments</li>
+              </ul>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-content">
+              <h4>Ověření instalace</h4>
+              <pre><code><span class="prompt">$ </span>claude --version
+<span class="str">@anthropic-ai/claude-code 1.x.x</span>
+
+<span class="prompt">$ </span>claude doctor
+<span class="flag">✓</span> CLI nainstalováno
+<span class="flag">✓</span> Přihlášen jako user@example.com
+<span class="flag">✓</span> Připojení k API OK</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <h2>Způsoby spuštění</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Příkaz</th><th>Popis</th></tr></thead>
+            <tbody>
+              <tr><td><code>claude</code></td><td>Interaktivní REPL (nejčastější použití)</td></tr>
+              <tr><td><code>claude "dotaz"</code></td><td>Jednorázová odpověď (non-interaktivní)</td></tr>
+              <tr><td><code>claude -p "prompt"</code></td><td>Zpracování v pipeline (stdin/stdout)</td></tr>
+              <tr><td><code>cat soubor.py | claude -p "vysvětli"</code></td><td>Analýza souboru přes pipe</td></tr>
+              <tr><td><code>claude --model claude-opus-4-7</code></td><td>Výběr konkrétního modelu</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Aktualizace</h2>
+        <pre><code><span class="prompt">$ </span>npm update -g @anthropic-ai/claude-code</code></pre>
+
+        <div class="nav-bottom">
+          <div id="nav-prev" class="nav-btn">
+            <div class="nav-label">← Předchozí</div>
+            <div class="nav-title"></div>
+          </div>
+          <div id="nav-next" class="nav-btn next">
+            <div class="nav-label">Další →</div>
+            <div class="nav-title"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════ -->
+      <!-- SEKCE: PRVNÍ KROKY -->
+      <!-- ══════════════════════════════════════════════════════ -->
+      <section class="section" id="prvni-kroky">
+        <div class="page-header">
+          <div class="page-icon">🚀</div>
+          <div>
+            <h1>První kroky</h1>
+            <p class="page-subtitle">Jak efektivně komunikovat s Claude Code od prvního dne</p>
+          </div>
+        </div>
+
+        <h2>Interaktivní REPL</h2>
+        <p>Spusťte <code>claude</code> v kořenovém adresáři vašeho projektu. Claude automaticky přečte váš projekt, git historii a pochopí kontext.</p>
+        <pre><code><span class="prompt">$ </span>cd ~/projects/muj-projekt
+<span class="prompt">$ </span>claude
+<span class="str">╭────────────────────────────────────────╮
+│  Claude Code  (Sonnet 4.6)             │
+│  Pracovní adresář: ~/projects/muj-projekt │
+╰────────────────────────────────────────╯</span>
+
+<span class="var">Vy:</span> Analyzuj strukturu projektu a řekni mi, co dělá
+
+<span class="fn">Claude:</span> Podívám se na strukturu projektu...
+<span class="cm">[čte soubory, analyzuje kód]</span>
+Toto je Flask aplikace se třemi moduly...</code></pre>
+
+        <h2>Typy požadavků</h2>
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-emoji">🔍</div>
+            <h4>Analýza</h4>
+            <p>"Proč tento test selhává?" / "Vysvětli mi tuto funkci"</p>
+          </div>
+          <div class="card">
+            <div class="card-emoji">🛠️</div>
+            <h4>Oprava chyb</h4>
+            <p>"Oprav bug na řádku 45 v auth.py"</p>
+          </div>
+          <div class="card">
+            <div class="card-emoji">✨</div>
+            <h4>Nová funkce</h4>
+            <p>"Přidej endpoint pro reset hesla"</p>
+          </div>
+          <div class="card">
+            <div class="card-emoji">♻️</div>
+            <h4>Refaktoring</h4>
+            <p>"Přepište tuto třídu na funkce"</p>
+          </div>
+        </div>
+
+        <h2>Jak psát dobré prompty</h2>
+        <div class="callout callout-tip">
+          <div class="callout-icon">💡</div>
+          <div class="callout-body">
+            <p><strong>Buďte konkrétní.</strong> Místo „oprav kód" napište „oprav funkci <code>calculate_tax()</code> v souboru <code>billing.py</code> – vrací záporné hodnoty pro vstupy nad 1000".</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Špatný prompt</th><th>Dobrý prompt</th></tr></thead>
+            <tbody>
+              <tr><td>„Udělej to lepší"</td><td>„Optimalizuj SQL dotaz v db.py:45 – trvá 3s na 10k záznamech"</td></tr>
+              <tr><td>„Přidej přihlašování"</td><td>„Přidej JWT autentizaci do Flask API, tokeny platné 24h"</td></tr>
+              <tr><td>„Proč to nefunguje?"</td><td>„Test <code>test_user_creation</code> selže s <code>IntegrityError</code>, zde je traceback: …"</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Schvalování akcí</h2>
+        <p>Claude Code vás vždy požádá o souhlas před:</p>
+        <ul>
+          <li>Spuštěním shell příkazů (<code>Bash</code>)</li>
+          <li>Zápisem nebo smazáním souborů</li>
+          <li>Pushováním do git remote</li>
+          <li>Voláním externích API</li>
+        </ul>
+        <p>Odpovídáte <kbd>y</kbd> (ano) nebo <kbd>n</kbd> (ne). Pro automatické schvalování určitých příkazů použijte <code>allowedTools</code> v settings.json.</p>
+
+        <h2>Kontextové okno a /compact</h2>
+        <p>Při dlouhých sezeních se kontext zaplní. Claude vás varuje a nabídne <code>/compact</code> – automaticky shrne historii a uvolní místo pro nové úkoly bez ztráty důležitého kontextu.</p>
+
+        <div class="nav-bottom">
+          <div id="nav-prev" class="nav-btn">
+            <div class="nav-label">← Předchozí</div>
+            <div class="nav-title"></div>
+          </div>
+          <div id="nav-next" class="nav-btn next">
+            <div class="nav-label">Další →</div>
+            <div class="nav-title"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════ -->
+      <!-- SEKCE: SLASH PŘÍKAZY -->
+      <!-- ══════════════════════════════════════════════════════ -->
+      <section class="section" id="slash-prikazy">
+        <div class="page-header">
+          <div class="page-icon">📟</div>
+          <div>
+            <h1>Slash příkazy</h1>
+            <p class="page-subtitle">Vestavěné příkazy začínající lomítkem pro správu sezení</p>
+          </div>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-icon">ℹ️</div>
+          <div class="callout-body">
+            <p>Slash příkazy fungují pouze v interaktivním REPL režimu. Zadejte <code>/help</code> pro aktuální seznam všech dostupných příkazů.</p>
+          </div>
+        </div>
+
+        <h2>Správa sezení</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Příkaz</th><th>Popis</th></tr></thead>
+            <tbody>
+              <tr><td><code>/help</code></td><td>Zobrazí všechny dostupné příkazy</td></tr>
+              <tr><td><code>/clear</code></td><td>Vymaže kontext sezení (začne nové)</td></tr>
+              <tr><td><code>/compact</code></td><td>Shrne historii a uvolní kontext</td></tr>
+              <tr><td><code>/compact [instrukce]</code></td><td>Shrnutí s vlastními pokyny, co zachovat</td></tr>
+              <tr><td><code>/cost</code></td><td>Zobrazí spotřebu tokenů a cenu sezení</td></tr>
+              <tr><td><code>/status</code></td><td>Stav připojení, model, kontext</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Konfigurace a nastavení</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Příkaz</th><th>Popis</th></tr></thead>
+            <tbody>
+              <tr><td><code>/config</code></td><td>Otevře interaktivní konfiguraci</td></tr>
+              <tr><td><code>/doctor</code></td><td>Diagnostika instalace a připojení</td></tr>
+              <tr><td><code>/model</code></td><td>Přepne model (opus/sonnet/haiku)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Paměť a kontext</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Příkaz</th><th>Popis</th></tr></thead>
+            <tbody>
+              <tr><td><code>/memory</code></td><td>Zobrazí / upraví soubory paměti</td></tr>
+              <tr><td><code>/init</code></td><td>Vygeneruje CLAUDE.md pro aktuální projekt</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Kód a revize</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Příkaz</th><th>Popis</th></tr></thead>
+            <tbody>
+              <tr><td><code>/review</code></td><td>Spustí code review aktuální větve</td></tr>
+              <tr><td><code>/ide</code></td><td>Správa IDE integrace</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Vlastní slash příkazy</h2>
+        <p>Můžete si definovat vlastní slash příkazy pomocí souborů v <code>.claude/commands/</code>:</p>
+        <pre><code><span class="cm"># .claude/commands/deploy.md</span>
+Zkontroluj, zda všechny testy prošly, pak vytvoř commit
+s aktuálními změnami a pushni do větve main.</code></pre>
+        <p>Příkaz pak spustíte jako <code>/deploy</code>.</p>
+
+        <div class="nav-bottom">
+          <div id="nav-prev" class="nav-btn">
+            <div class="nav-label">← Předchozí</div>
+            <div class="nav-title"></div>
+          </div>
+          <div id="nav-next" class="nav-btn next">
+            <div class="nav-label">Další →</div>
+            <div class="nav-title"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════ -->
+      <!-- SEKCE: KLÁVESOVÉ ZKRATKY -->
+      <!-- ══════════════════════════════════════════════════════ -->
+      <section class="section" id="klavesove-zkratky">
+        <div class="page-header">
+          <div class="page-icon">⌨️</div>
+          <div>
+            <h1>Klávesové zkratky</h1>
+            <p class="page-subtitle">Ovládání REPL bez použití myši</p>
+          </div>
+        </div>
+
+        <h2>Zadávání textu</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Zkratka</th><th>Akce</th></tr></thead>
+            <tbody>
+              <tr><td><kbd>Enter</kbd></td><td>Odeslat zprávu</td></tr>
+              <tr><td><kbd>Shift</kbd> + <kbd>Enter</kbd></td><td>Nový řádek (víceřádkový vstup)</td></tr>
+              <tr><td><kbd>Ctrl</kbd> + <kbd>J</kbd></td><td>Alternativní nový řádek</td></tr>
+              <tr><td><kbd>↑</kbd> / <kbd>↓</kbd></td><td>Procházení historie příkazů</td></tr>
+              <tr><td><kbd>Ctrl</kbd> + <kbd>R</kbd></td><td>Prohledávání historie (reverse search)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Ovládání sezení</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Zkratka</th><th>Akce</th></tr></thead>
+            <tbody>
+              <tr><td><kbd>Ctrl</kbd> + <kbd>C</kbd></td><td>Přerušit aktuální generování (Claude okamžitě zastaví)</td></tr>
+              <tr><td><kbd>Ctrl</kbd> + <kbd>C</kbd> <kbd>Ctrl</kbd> + <kbd>C</kbd></td><td>Ukončit Claude Code</td></tr>
+              <tr><td><kbd>Ctrl</kbd> + <kbd>D</kbd></td><td>Ukončit (EOF)</td></tr>
+              <tr><td><kbd>Esc</kbd></td><td>Zrušit schválení nástroje</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Schvalování nástrojů</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Klávesa</th><th>Akce</th></tr></thead>
+            <tbody>
+              <tr><td><kbd>y</kbd> / <kbd>Enter</kbd></td><td>Schválit nástroj (jednorázově)</td></tr>
+              <tr><td><kbd>n</kbd></td><td>Odmítnout nástroj</td></tr>
+              <tr><td><kbd>a</kbd></td><td>Schválit pro celé sezení</td></tr>
+              <tr><td><kbd>!</kbd></td><td>Spustit shell příkaz místo schválení</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Vlastní klávesové zkratky</h2>
+        <p>Přidejte vlastní zkratky do <code>~/.claude/keybindings.json</code>:</p>
+        <pre><code>[
+  {
+    <span class="str">"key"</span>: <span class="str">"ctrl+shift+c"</span>,
+    <span class="str">"command"</span>: <span class="str">"/compact"</span>
+  },
+  {
+    <span class="str">"key"</span>: <span class="str">"ctrl+shift+r"</span>,
+    <span class="str">"command"</span>: <span class="str">"/review"</span>
+  }
+]</code></pre>
+
+        <div class="nav-bottom">
+          <div id="nav-prev" class="nav-btn">
+            <div class="nav-label">← Předchozí</div>
+            <div class="nav-title"></div>
+          </div>
+          <div id="nav-next" class="nav-btn next">
+            <div class="nav-label">Další →</div>
+            <div class="nav-title"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════ -->
+      <!-- SEKCE: NÁSTROJE -->
+      <!-- ══════════════════════════════════════════════════════ -->
+      <section class="section" id="nastroje">
+        <div class="page-header">
+          <div class="page-icon">🔧</div>
+          <div>
+            <h1>Nástroje (Tools)</h1>
+            <p class="page-subtitle">Vestavěné nástroje, které Claude může volat při plnění úkolů</p>
+          </div>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-icon">ℹ️</div>
+          <div class="callout-body">
+            <p>Každý nástroj vyžaduje vaše schválení (pokud ho nepovolíte automaticky v <code>allowedTools</code>). Claude vám vždy ukáže, co hodlá udělat, než to provede.</p>
+          </div>
+        </div>
+
+        <h2>Souborové nástroje</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nástroj</th><th>Popis</th><th>Příklad</th></tr></thead>
+            <tbody>
+              <tr><td><code>Read</code></td><td>Čte soubor nebo jeho část</td><td><code>Read("src/main.py", offset=50, limit=100)</code></td></tr>
+              <tr><td><code>Write</code></td><td>Zapíše celý soubor</td><td>Vytvoření nového souboru</td></tr>
+              <tr><td><code>Edit</code></td><td>Přesná nahrazení řetězců v souboru</td><td>Oprava konkrétní funkce</td></tr>
+              <tr><td><code>MultiEdit</code></td><td>Více editací v jednom souboru</td><td>Refaktoring celé třídy</td></tr>
+              <tr><td><code>Glob</code></td><td>Hledá soubory podle vzoru</td><td><code>Glob("src/**/*.py")</code></td></tr>
+              <tr><td><code>Grep</code></td><td>Prohledávání obsahu souborů</td><td><code>Grep("TODO", "src/")</code></td></tr>
+              <tr><td><code>LS</code></td><td>Výpis adresáře</td><td><code>LS("src/components")</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Shell a systém</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nástroj</th><th>Popis</th></tr></thead>
+            <tbody>
+              <tr><td><code>Bash</code></td><td>Spouští shell příkazy (s timeoutem, v sandboxu)</td></tr>
+              <tr><td><code>TodoRead / TodoWrite</code></td><td>Správa TODO seznamu pro aktuální sezení</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Web nástroje</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nástroj</th><th>Popis</th></tr></thead>
+            <tbody>
+              <tr><td><code>WebFetch</code></td><td>Stáhne a přečte webovou stránku (HTML → text)</td></tr>
+              <tr><td><code>WebSearch</code></td><td>Prohledá web a vrátí výsledky</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Agent nástroje</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nástroj</th><th>Popis</th></tr></thead>
+            <tbody>
+              <tr><td><code>Agent</code></td><td>Spustí subagenta s vlastním kontextem a sadou nástrojů</td></tr>
+              <tr><td><code>Task</code></td><td>Správa dlouhodobých úloh</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Příklad: Bash nástroj</h2>
+        <pre><code><span class="cm"># Claude navrhne spuštění:</span>
+<span class="fn">Bash</span>({
+  <span class="str">"command"</span>: <span class="str">"pytest tests/ -v --tb=short"</span>,
+  <span class="str">"description"</span>: <span class="str">"Spustit testy a zobrazit detailní výstup"</span>,
+  <span class="str">"timeout"</span>: <span class="num">60000</span>
+})
+
+<span class="cm"># Výstup:</span>
+<span class="str">PASSED tests/test_auth.py::test_login</span>
+<span class="str">PASSED tests/test_auth.py::test_logout</span>
+<span class="flag">FAILED tests/test_billing.py::test_invoice</span>
+<span class="str">2 passed, 1 failed in 1.34s</span></code></pre>
+
+        <h2>Omezení nástrojů</h2>
+        <p>V <code>settings.json</code> (sekce <code>permissions</code>) lze nástroje povolit nebo zakázat:</p>
+        <pre><code>{
+  <span class="str">"permissions"</span>: {
+    <span class="str">"allow"</span>: [
+      <span class="str">"Bash(npm test)"</span>,
+      <span class="str">"Bash(git status)"</span>,
+      <span class="str">"Read(**)"</span>
+    ],
+    <span class="str">"deny"</span>: [
+      <span class="str">"Bash(rm -rf *)"</span>
+    ]
+  }
+}</code></pre>
+
+        <div class="nav-bottom">
+          <div id="nav-prev" class="nav-btn">
+            <div class="nav-label">← Předchozí</div>
+            <div class="nav-title"></div>
+          </div>
+          <div id="nav-next" class="nav-btn next">
+            <div class="nav-label">Další →</div>
+            <div class="nav-title"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════ -->
+      <!-- SEKCE: CLAUDE.md -->
+      <!-- ══════════════════════════════════════════════════════ -->
+      <section class="section" id="claude-md">
+        <div class="page-header">
+          <div class="page-icon">📝</div>
+          <div>
+            <h1>CLAUDE.md</h1>
+            <p class="page-subtitle">Soubor s instrukcemi, který Claude automaticky čte na začátku každého sezení</p>
+          </div>
+        </div>
+
+        <h2>Co je CLAUDE.md?</h2>
+        <p>CLAUDE.md je Markdown soubor, který Claude Code načte automaticky. Slouží jako „systémový prompt" specifický pro váš projekt – popisuje konvence, zákazy, architekturu a cokoliv, co má Claude vždy vědět.</p>
+
+        <h2>Umístění souborů</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Cesta</th><th>Platnost</th><th>Použití</th></tr></thead>
+            <tbody>
+              <tr><td><code>~/.claude/CLAUDE.md</code></td><td>Globální</td><td>Vaše osobní preference platné ve všech projektech</td></tr>
+              <tr><td><code>./CLAUDE.md</code></td><td>Projekt</td><td>Pravidla konkrétního projektu (commitujte do gitu)</td></tr>
+              <tr><td><code>src/CLAUDE.md</code></td><td>Podadresář</td><td>Specifická pravidla pro část projektu</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Generování pomocí /init</h2>
+        <pre><code><span class="prompt">$ </span>claude
+<span class="var">Vy:</span> /init</code></pre>
+        <p>Claude prozkoumá váš projekt a automaticky vytvoří relevantní CLAUDE.md s popisem architektury, testovacích příkazů a konvencí.</p>
+
+        <h2>Šablona CLAUDE.md</h2>
+        <pre><code><span class="cm"># CLAUDE.md – Moje Flask aplikace</span>
+
+<span class="kw">## Projekt</span>
+REST API pro správu skladu. Backend Python/Flask, databáze PostgreSQL,
+testy pytest, deployment na AWS.
+
+<span class="kw">## Příkazy</span>
+- Spuštění: `flask run --debug`
+- Testy: `pytest tests/ -v`
+- Migrace: `flask db migrate && flask db upgrade`
+- Linter: `ruff check . && mypy src/`
+
+<span class="kw">## Konvence kódu</span>
+- Python 3.12, PEP 8, type hints vždy
+- Funkce místo tříd kde je to možné
+- Žádné `print()` – pouze `logger.info()`
+- Všechny API endpointy v `src/api/`, modely v `src/models/`
+
+<span class="kw">## Zakázáno</span>
+- Nikdy nepoužívej `sudo`
+- Nikdy necommituj `.env` soubory
+- Nepřidávej závislosti bez schválení
+
+<span class="kw">## Git workflow</span>
+- Větve: `feature/`, `fix/`, `chore/`
+- Commit messages v češtině
+- Před pushnutím vždy spusť testy</code></pre>
+
+        <h2>Tipy pro psaní CLAUDE.md</h2>
+        <ul>
+          <li>Pište stručně – Claude čte celý soubor při každém sezení</li>
+          <li>Zahrňte konkrétní příkazy (ne jen „spusť testy")</li>
+          <li>Uveďte co Claude <strong>nesmí</strong> dělat (zakázané akce)</li>
+          <li>Popište strukturu adresářů pro velké projekty</li>
+          <li>Commitujte CLAUDE.md do gitu – je součástí projektu</li>
+        </ul>
+
+        <div class="nav-bottom">
+          <div id="nav-prev" class="nav-btn">
+            <div class="nav-label">← Předchozí</div>
+            <div class="nav-title"></div>
+          </div>
+          <div id="nav-next" class="nav-btn next">
+            <div class="nav-label">Další →</div>
+            <div class="nav-title"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════ -->
+      <!-- SEKCE: KONFIGURACE -->
+      <!-- ══════════════════════════════════════════════════════ -->
+      <section class="section" id="konfigurace">
+        <div class="page-header">
+          <div class="page-icon">🛠️</div>
+          <div>
+            <h1>settings.json</h1>
+            <p class="page-subtitle">Konfigurace oprávnění, nástrojů, modelů a prostředí</p>
+          </div>
+        </div>
+
+        <h2>Umístění</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Soubor</th><th>Platnost</th></tr></thead>
+            <tbody>
+              <tr><td><code>~/.claude/settings.json</code></td><td>Globální (všechny projekty)</td></tr>
+              <tr><td><code>.claude/settings.json</code></td><td>Projekt (commitovat do gitu)</td></tr>
+              <tr><td><code>.claude/settings.local.json</code></td><td>Lokální projekt (necommitovat – .gitignore)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Kompletní příklad</h2>
+        <pre><code>{
+  <span class="cm">// Výchozí model</span>
+  <span class="str">"model"</span>: <span class="str">"claude-sonnet-4-6"</span>,
+
+  <span class="cm">// Oprávnění nástrojů</span>
+  <span class="str">"permissions"</span>: {
+    <span class="str">"allow"</span>: [
+      <span class="str">"Bash(npm *)"</span>,
+      <span class="str">"Bash(git status)"</span>,
+      <span class="str">"Bash(git diff *)"</span>,
+      <span class="str">"Bash(pytest *)"</span>,
+      <span class="str">"Bash(python *)"</span>,
+      <span class="str">"Read(**)"</span>,
+      <span class="str">"Edit(**)"</span>,
+      <span class="str">"Write(**)"</span>
+    ],
+    <span class="str">"deny"</span>: [
+      <span class="str">"Bash(rm -rf *)"</span>,
+      <span class="str">"Bash(* --force *)"</span>
+    ]
+  },
+
+  <span class="cm">// Proměnné prostředí dostupné Claudovi</span>
+  <span class="str">"env"</span>: {
+    <span class="str">"PYTHONPATH"</span>: <span class="str">"./src"</span>,
+    <span class="str">"NODE_ENV"</span>: <span class="str">"development"</span>
+  },
+
+  <span class="cm">// Hooks (viz sekce Hooks)</span>
+  <span class="str">"hooks"</span>: {
+    <span class="str">"PostToolUse"</span>: [...]
+  }
+}</code></pre>
+
+        <h2>Vzory oprávnění</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Vzor</th><th>Popis</th></tr></thead>
+            <tbody>
+              <tr><td><code>Bash(npm *)</code></td><td>Povolí všechny npm příkazy</td></tr>
+              <tr><td><code>Bash(git status)</code></td><td>Povolí pouze přesně <code>git status</code></td></tr>
+              <tr><td><code>Read(**)</code></td><td>Povolí čtení všech souborů</td></tr>
+              <tr><td><code>Read(src/**)</code></td><td>Povolí čtení pouze v src/</td></tr>
+              <tr><td><code>WebFetch(*)</code></td><td>Povolí stahování libovolné URL</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Příkaz /config</h2>
+        <p>Pro interaktivní konfiguraci bez přímé editace JSON:</p>
+        <pre><code><span class="var">Vy:</span> /config
+<span class="cm"># Otevře interaktivní menu s nastavením</span>
+<span class="cm"># Model, oprávnění, téma, atd.</span></code></pre>
+
+        <div class="nav-bottom">
+          <div id="nav-prev" class="nav-btn">
+            <div class="nav-label">← Předchozí</div>
+            <div class="nav-title"></div>
+          </div>
+          <div id="nav-next" class="nav-btn next">
+            <div class="nav-label">Další →</div>
+            <div class="nav-title"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════ -->
+      <!-- SEKCE: HOOKS -->
+      <!-- ══════════════════════════════════════════════════════ -->
+      <section class="section" id="hooks">
+        <div class="page-header">
+          <div class="page-icon">🪝</div>
+          <div>
+            <h1>Hooks</h1>
+            <p class="page-subtitle">Shell skripty automaticky spouštěné při specifických událostech</p>
+          </div>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-icon">ℹ️</div>
+          <div class="callout-body">
+            <p>Hooks jsou shell příkazy v <code>settings.json</code>, které se automaticky spustí při určitých událostech – například po každém zápisu souboru, nebo po každém shell příkazu. Harness (ne Claude) je spouští.</p>
+          </div>
+        </div>
+
+        <h2>Typy hooků</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Typ</th><th>Kdy se spustí</th></tr></thead>
+            <tbody>
+              <tr><td><code>PreToolUse</code></td><td>Před každým voláním nástroje (může ho zablokovat)</td></tr>
+              <tr><td><code>PostToolUse</code></td><td>Po každém volání nástroje (pouze informativní)</td></tr>
+              <tr><td><code>Stop</code></td><td>Když Claude dokončí svou odpověď</td></tr>
+              <tr><td><code>Notification</code></td><td>Při systémových notifikacích</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Příklady hooků</h2>
+
+        <h3>Auto-formátování po každém zápisu</h3>
+        <pre><code>{
+  <span class="str">"hooks"</span>: {
+    <span class="str">"PostToolUse"</span>: [
+      {
+        <span class="str">"matcher"</span>: <span class="str">"Write|Edit"</span>,
+        <span class="str">"hooks"</span>: [
+          {
+            <span class="str">"type"</span>: <span class="str">"command"</span>,
+            <span class="str">"command"</span>: <span class="str">"ruff format $CLAUDE_TOOL_INPUT_FILE_PATH 2>/dev/null || true"</span>
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+
+        <h3>Notifikace po dokončení úkolu</h3>
+        <pre><code>{
+  <span class="str">"hooks"</span>: {
+    <span class="str">"Stop"</span>: [
+      {
+        <span class="str">"hooks"</span>: [
+          {
+            <span class="str">"type"</span>: <span class="str">"command"</span>,
+            <span class="str">"command"</span>: <span class="str">"notify-send 'Claude Code' 'Úkol dokončen!' 2>/dev/null || true"</span>
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+
+        <h3>Bezpečnostní kontrola před shell příkazy</h3>
+        <pre><code>{
+  <span class="str">"hooks"</span>: {
+    <span class="str">"PreToolUse"</span>: [
+      {
+        <span class="str">"matcher"</span>: <span class="str">"Bash"</span>,
+        <span class="str">"hooks"</span>: [
+          {
+            <span class="str">"type"</span>: <span class="str">"command"</span>,
+            <span class="str">"command"</span>: <span class="str">"echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'rm -rf' && exit 2 || exit 0"</span>
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+
+        <h2>Proměnné prostředí v hoocích</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Proměnná</th><th>Hodnota</th></tr></thead>
+            <tbody>
+              <tr><td><code>$CLAUDE_TOOL_NAME</code></td><td>Název volaného nástroje (Bash, Write, …)</td></tr>
+              <tr><td><code>$CLAUDE_TOOL_INPUT</code></td><td>JSON vstup nástroje</td></tr>
+              <tr><td><code>$CLAUDE_TOOL_INPUT_FILE_PATH</code></td><td>Cesta k souboru (pro Write/Edit)</td></tr>
+              <tr><td><code>$CLAUDE_TOOL_OUTPUT</code></td><td>Výstup nástroje (PostToolUse)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-warn">
+          <div class="callout-icon">⚠️</div>
+          <div class="callout-body">
+            <p>Hook s exit kódem <code>2</code> zablokuje volání nástroje (PreToolUse). Jiné exit kódy jsou ignorovány (PostToolUse je vždy pouze informativní).</p>
+          </div>
+        </div>
+
+        <div class="nav-bottom">
+          <div id="nav-prev" class="nav-btn">
+            <div class="nav-label">← Předchozí</div>
+            <div class="nav-title"></div>
+          </div>
+          <div id="nav-next" class="nav-btn next">
+            <div class="nav-label">Další →</div>
+            <div class="nav-title"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════ -->
+      <!-- SEKCE: AGENTI -->
+      <!-- ══════════════════════════════════════════════════════ -->
+      <section class="section" id="agenti">
+        <div class="page-header">
+          <div class="page-icon">🤖</div>
+          <div>
+            <h1>Agent Tool</h1>
+            <p class="page-subtitle">Spouštění subagentů s vlastním kontextem, sadou nástrojů a specializací</p>
+          </div>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-icon">ℹ️</div>
+          <div class="callout-body">
+            <p>Agent tool umožňuje hlavnímu Claudovi (orchestrátoru) spustit jednoho nebo více subagentů. Každý subagent dostane vlastní prompt, sadu nástrojů a pracovní prostor – a vrátí výsledek zpět orchestrátoru.</p>
+          </div>
+        </div>
+
+        <h2>Základní princip</h2>
+        <pre><code><span class="cm"># Orchestrátor pošle subagentovi úkol:</span>
+<span class="fn">Agent</span>({
+  <span class="str">"description"</span>: <span class="str">"Analýza bezpečnosti API endpointů"</span>,
+  <span class="str">"prompt"</span>: <span class="str">"Projdi všechny soubory v src/api/ a najdi
+    potenciální bezpečnostní zranitelnosti. Zkontroluj:
+    SQL injection, XSS, autentizaci. Vrať seznam problémů."</span>,
+  <span class="str">"subagent_type"</span>: <span class="str">"general-purpose"</span>
+})</code></pre>
+
+        <h2>Typy subagentů</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Typ</th><th>Specializace</th><th>Dostupné nástroje</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>general-purpose</code></td>
+                <td>Obecný agent pro komplexní úkoly</td>
+                <td>Všechny nástroje</td>
+              </tr>
+              <tr>
+                <td><code>Explore</code></td>
+                <td>Rychlé read-only prohledávání kódu</td>
+                <td>Read, Grep, LS, Glob, WebSearch</td>
+              </tr>
+              <tr>
+                <td><code>Plan</code></td>
+                <td>Návrh implementačních plánů</td>
+                <td>Read-only + ExitPlanMode</td>
+              </tr>
+              <tr>
+                <td><code>claude-code-guide</code></td>
+                <td>Dotazy na Claude Code samotný</td>
+                <td>Bash, Read, WebFetch, WebSearch</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Parametry Agent toolu</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Parametr</th><th>Typ</th><th>Popis</th></tr></thead>
+            <tbody>
+              <tr><td><code>description</code></td><td>string <span class="badge badge-orange">povinný</span></td><td>Krátký popis úkolu (3–5 slov)</td></tr>
+              <tr><td><code>prompt</code></td><td>string <span class="badge badge-orange">povinný</span></td><td>Kompletní instrukce pro subagenta</td></tr>
+              <tr><td><code>subagent_type</code></td><td>string</td><td>Typ specializovaného agenta</td></tr>
+              <tr><td><code>model</code></td><td>string</td><td>Přepsání modelu (sonnet/opus/haiku)</td></tr>
+              <tr><td><code>run_in_background</code></td><td>boolean</td><td>Spustit na pozadí, nekoukat na výsledek hned</td></tr>
+              <tr><td><code>isolation</code></td><td>string</td><td><code>"worktree"</code> – izolovaná kopie repozitáře</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Kdy použít Agent tool</h2>
+        <ul>
+          <li><strong>Velké codebase průzkumy</strong> – prohledávání stovek souborů</li>
+          <li><strong>Izolované úkoly</strong> – subagent s jiným zaměřením (bezpečnost, testy, dokumentace)</li>
+          <li><strong>Ochrana kontextu</strong> – výsledky subagenta se vrátí shrnuté, ne jako surový výstup</li>
+          <li><strong>Paralelní práce</strong> – více agentů pracuje současně na různých částech</li>
+        </ul>
+
+        <h2>Izolace pomocí worktree</h2>
+        <pre><code><span class="fn">Agent</span>({
+  <span class="str">"description"</span>: <span class="str">"Riziková refaktorizace"</span>,
+  <span class="str">"prompt"</span>: <span class="str">"Přepište modul auth.py na nový systém tokenů."</span>,
+  <span class="str">"isolation"</span>: <span class="str">"worktree"</span>
+  <span class="cm">// Subagent pracuje na izolované kopii repozitáře.
+  // Změny se nezaplní do vaší větve automaticky.</span>
+})</code></pre>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon">💡</div>
+          <div class="callout-body">
+            <p><strong>Worktree isolace</strong> je skvělá pro experimenty: subagent provede změny v dočasné větvi. Pokud je výsledek špatný, změny se zahodí. Pokud dobrý, můžete je mergnout.</p>
+          </div>
+        </div>
+
+        <div class="nav-bottom">
+          <div id="nav-prev" class="nav-btn">
+            <div class="nav-label">← Předchozí</div>
+            <div class="nav-title"></div>
+          </div>
+          <div id="nav-next" class="nav-btn next">
+            <div class="nav-label">Další →</div>
+            <div class="nav-title"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════ -->
+      <!-- SEKCE: NASTAVENÍ AGENTŮ -->
+      <!-- ══════════════════════════════════════════════════════ -->
+      <section class="section" id="agent-nastaveni">
+        <div class="page-header">
+          <div class="page-icon">⚙️</div>
+          <div>
+            <h1>Nastavení agentů</h1>
+            <p class="page-subtitle">Jak konfigurovat agenty – model, nástroje, kontext, oprávnění a výstup</p>
+          </div>
+        </div>
+
+        <h2>Přehled všech parametrů</h2>
+        <pre><code><span class="fn">Agent</span>({
+  <span class="cm">// ─── Povinné ────────────────────────────────────────────</span>
+  <span class="str">"description"</span>: <span class="str">"Krátký popis (3–5 slov)"</span>,   <span class="cm">// pro přehled v logu</span>
+  <span class="str">"prompt"</span>: <span class="str">"Kompletní instrukce..."</span>,        <span class="cm">// soběstačný prompt</span>
+
+  <span class="cm">// ─── Výběr agenta ───────────────────────────────────────</span>
+  <span class="str">"subagent_type"</span>: <span class="str">"general-purpose"</span>,    <span class="cm">// typ specializace</span>
+
+  <span class="cm">// ─── Model ──────────────────────────────────────────────</span>
+  <span class="str">"model"</span>: <span class="str">"sonnet"</span>,                      <span class="cm">// sonnet | opus | haiku</span>
+
+  <span class="cm">// ─── Izolace ────────────────────────────────────────────</span>
+  <span class="str">"isolation"</span>: <span class="str">"worktree"</span>,               <span class="cm">// izolovaná git větev</span>
+
+  <span class="cm">// ─── Spuštění ───────────────────────────────────────────</span>
+  <span class="str">"run_in_background"</span>: <span class="kw">false</span>              <span class="cm">// true = spustit na pozadí</span>
+})</code></pre>
+
+        <h2>Výběr modelu pro agenta</h2>
+        <p>Každý agent může mít jiný model. Tím lze optimalizovat cenu i rychlost celého systému:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Hodnota</th><th>Model</th><th>Kdy použít pro agenta</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>"opus"</code></td>
+                <td>claude-opus-4-7</td>
+                <td>Orchestrátor, složité plánování, kritické rozhodnutí</td>
+              </tr>
+              <tr>
+                <td><code>"sonnet"</code></td>
+                <td>claude-sonnet-4-6</td>
+                <td>Implementace kódu, review, většina workerů</td>
+              </tr>
+              <tr>
+                <td><code>"haiku"</code></td>
+                <td>claude-haiku-4-5</td>
+                <td>Průzkum kódu, jednoduché transformace, rychlé úkoly</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <pre><code><span class="cm"># Orchestrátor (Opus) řídí levnější workery:</span>
+
+<span class="cm"># Průzkumné agenty – rychlé a levné</span>
+<span class="fn">Agent</span>({
+  <span class="str">"description"</span>: <span class="str">"Průzkum kódu"</span>,
+  <span class="str">"prompt"</span>: <span class="str">"Najdi všechny funkce bez typových anotací"</span>,
+  <span class="str">"subagent_type"</span>: <span class="str">"Explore"</span>,
+  <span class="str">"model"</span>: <span class="str">"haiku"</span>   <span class="cm">// nejrychlejší a nejlevnější</span>
+})
+
+<span class="cm"># Implementační agent – potřebuje víc inteligence</span>
+<span class="fn">Agent</span>({
+  <span class="str">"description"</span>: <span class="str">"Doplnění type hints"</span>,
+  <span class="str">"prompt"</span>: <span class="str">"Doplň type annotations do všech funkcí v src/"</span>,
+  <span class="str">"model"</span>: <span class="str">"sonnet"</span>  <span class="cm">// dobrý poměr cena/výkon</span>
+})</code></pre>
+
+        <h2>Nastavení dostupných nástrojů</h2>
+        <p>Typ agenta (<code>subagent_type</code>) určuje, které nástroje má k dispozici:</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Typ</th><th>Dostupné nástroje</th><th>Typické použití</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>general-purpose</code></td>
+                <td>Všechny (Bash, Read, Write, Edit, Web…)</td>
+                <td>Implementace, opravy, obecné úkoly</td>
+              </tr>
+              <tr>
+                <td><code>Explore</code></td>
+                <td>Read, Grep, LS, Glob, WebSearch, WebFetch</td>
+                <td>Průzkum kódu (nemodifikuje soubory)</td>
+              </tr>
+              <tr>
+                <td><code>Plan</code></td>
+                <td>Vše kromě Edit/Write/Bash destructive</td>
+                <td>Návrh řešení, architektura</td>
+              </tr>
+              <tr>
+                <td><code>claude-code-guide</code></td>
+                <td>Bash, Read, WebFetch, WebSearch</td>
+                <td>Dotazy na Claude Code funkce</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon">💡</div>
+          <div class="callout-body">
+            <p>Použijte <code>Explore</code> vždy, když agent má pouze číst a analyzovat – <strong>nikoli psát</strong>. Je bezpečnější (nemůže nic pokazit) a rychlejší, protože nepotřebuje schvalování oprávnění.</p>
+          </div>
+        </div>
+
+        <h2>Worktree izolace – nastavení</h2>
+        <p>S <code>"isolation": "worktree"</code> agent dostane izolovanou kopii repozitáře v nové větvi:</p>
+        <pre><code>result = <span class="fn">Agent</span>({
+  <span class="str">"description"</span>: <span class="str">"Experimentální refaktoring"</span>,
+  <span class="str">"prompt"</span>: <span class="str">"Přepiš celý modul billing/ na async/await"</span>,
+  <span class="str">"isolation"</span>: <span class="str">"worktree"</span>
+})
+
+<span class="cm"># result obsahuje:
+#   - path: cesta k dočasnému worktree
+#   - branch: název vytvořené větve
+# Pokud agent neprovede žádnou změnu, worktree se smaže automaticky.</span></code></pre>
+
+        <h2>Jak napsat dobrý prompt pro agenta</h2>
+        <div class="callout callout-warn">
+          <div class="callout-icon">⚠️</div>
+          <div class="callout-body">
+            <p>Agent <strong>nevidí historii</strong> konverzace s orchestrátorem. Veškerý potřebný kontext musí být obsažen přímo v poli <code>prompt</code>.</p>
+          </div>
+        </div>
+
+        <p>Struktura dobrého promptu pro agenta:</p>
+        <pre><code><span class="fn">Agent</span>({
+  <span class="str">"description"</span>: <span class="str">"Oprava JWT validace"</span>,
+  <span class="str">"prompt"</span>: <span class="str">"""
+    KONTEXT:
+    Pracuješ v repozitáři Flask REST API.
+    Soubor s bugem: src/auth/tokens.py, funkce verify_token().
+
+    PROBLÉM:
+    Funkce vrací True i pro expirované JWT tokeny.
+    Pole 'exp' v payload není kontrolováno.
+
+    ÚKOL:
+    1. Přečti soubor src/auth/tokens.py
+    2. Oprav verify_token() – přidej kontrolu time.time() > payload['exp']
+    3. Spusť testy: pytest tests/test_auth.py -v
+    4. Pokud testy projdou, vytvoř commit s popisem opravy
+
+    VÝSTUP:
+    Vrať: 'OPRAVENO' nebo popis problému, pokud se nepodařilo opravit.
+  """</span>
+})</code></pre>
+
+        <h2>Šablona: Sekce dobrého promptu</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Sekce</th><th>Obsah</th><th>Povinná?</th></tr></thead>
+            <tbody>
+              <tr><td><strong>KONTEXT</strong></td><td>O jaký projekt/soubor/funkci jde</td><td><span class="badge badge-orange">Doporučena</span></td></tr>
+              <tr><td><strong>PROBLÉM / CÍLE</strong></td><td>Co je špatně nebo co chceme</td><td><span class="badge badge-orange">Povinná</span></td></tr>
+              <tr><td><strong>ÚKOL</strong></td><td>Číslovaný seznam kroků</td><td><span class="badge badge-orange">Doporučena</span></td></tr>
+              <tr><td><strong>OMEZENÍ</strong></td><td>Co nesmí agent dělat</td><td><span class="badge badge-green">Volitelná</span></td></tr>
+              <tr><td><strong>VÝSTUP</strong></td><td>Formát odpovědi (JSON, text, kód)</td><td><span class="badge badge-orange">Doporučena</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Výstup agenta – formátování</h2>
+        <p>Pokud orchestrátor potřebuje zpracovat výsledek agenta programaticky, definujte formát výstupu:</p>
+        <pre><code><span class="cm"># Požadavek na strukturovaný JSON výstup:</span>
+<span class="fn">Agent</span>({
+  <span class="str">"description"</span>: <span class="str">"Analýza závislostí"</span>,
+  <span class="str">"prompt"</span>: <span class="str">"""
+    Analyzuj package.json a najdi zastaralé závislosti.
+
+    Výstup MUSÍ být validní JSON v tomto formátu:
+    {
+      "outdated": [
+        {"name": "balicek", "current": "1.0.0", "latest": "2.0.0", "risk": "high|low"}
+      ],
+      "count": 5
+    }
+    Nevypisuj nic jiného než JSON.
+  """</span>,
+  <span class="str">"subagent_type"</span>: <span class="str">"Explore"</span>
+})</code></pre>
+
+        <h2>Paralelní nastavení různých agentů</h2>
+        <p>Každý agent v paralelní skupině může mít jiné nastavení modelu:</p>
+        <pre><code><span class="cm"># Tři agenty najednou, každý s jiným modelem:</span>
+
+<span class="fn">Agent</span>({  <span class="cm"># Rychlý průzkum</span>
+  <span class="str">"description"</span>: <span class="str">"Mapa souborů"</span>,
+  <span class="str">"prompt"</span>: <span class="str">"Vypiš všechny Python soubory a jejich velikost"</span>,
+  <span class="str">"subagent_type"</span>: <span class="str">"Explore"</span>,
+  <span class="str">"model"</span>: <span class="str">"haiku"</span>
+})
+
+<span class="fn">Agent</span>({  <span class="cm"># Kvalitní implementace</span>
+  <span class="str">"description"</span>: <span class="str">"Nová funkce"</span>,
+  <span class="str">"prompt"</span>: <span class="str">"Implementuj endpoint /api/export do src/api/export.py"</span>,
+  <span class="str">"model"</span>: <span class="str">"sonnet"</span>
+})
+
+<span class="fn">Agent</span>({  <span class="cm"># Kritická bezpečnostní analýza</span>
+  <span class="str">"description"</span>: <span class="str">"Security audit"</span>,
+  <span class="str">"prompt"</span>: <span class="str">"Proveď kompletní bezpečnostní audit celého projektu"</span>,
+  <span class="str">"model"</span>: <span class="str">"opus"</span>
+})</code></pre>
+
+        <div class="nav-bottom">
+          <div id="nav-prev" class="nav-btn">
+            <div class="nav-label">← Předchozí</div>
+            <div class="nav-title"></div>
+          </div>
+          <div id="nav-next" class="nav-btn next">
+            <div class="nav-label">Další →</div>
+            <div class="nav-title"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════ -->
+      <!-- SEKCE: PARALELNÍ AGENTI -->
+      <!-- ══════════════════════════════════════════════════════ -->
+      <section class="section" id="paralelni-agenti">
+        <div class="page-header">
+          <div class="page-icon">⚡</div>
+          <div>
+            <h1>Paralelní agenti</h1>
+            <p class="page-subtitle">Spouštění více agentů současně pro masivní zrychlení komplexních úkolů</p>
+          </div>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon">⚡</div>
+          <div class="callout-body">
+            <p><strong>Klíčové pravidlo:</strong> Pokud jsou dva úkoly na sobě nezávislé, vždy je pošlete agentům v <strong>jediné zprávě</strong> jako dvě volání Agent toolu. Tím se spustí souběžně.</p>
+          </div>
+        </div>
+
+        <h2>Jak funguje paralelismus</h2>
+        <p>Když orchestrátor (hlavní Claude) zavolá několik Agent toolů v jedné odpovědi, harness je spustí souběžně. Orchestrátor čeká na všechny výsledky a pak je zpracuje dohromady.</p>
+
+        <pre><code><span class="cm"># Orchestrátor volá 3 agenty NAJEDNOU (ve stejné odpovědi):</span>
+
+<span class="cm"># Agent 1 – analýza backendu</span>
+<span class="fn">Agent</span>({
+  <span class="str">"description"</span>: <span class="str">"Backend code review"</span>,
+  <span class="str">"prompt"</span>: <span class="str">"Analyzuj src/backend/ – najdi performance problémy"</span>,
+  <span class="str">"subagent_type"</span>: <span class="str">"Explore"</span>
+})
+
+<span class="cm"># Agent 2 – analýza frontendu (souběžně!)</span>
+<span class="fn">Agent</span>({
+  <span class="str">"description"</span>: <span class="str">"Frontend code review"</span>,
+  <span class="str">"prompt"</span>: <span class="str">"Analyzuj src/frontend/ – najdi performance problémy"</span>,
+  <span class="str">"subagent_type"</span>: <span class="str">"Explore"</span>
+})
+
+<span class="cm"># Agent 3 – testy (souběžně!)</span>
+<span class="fn">Agent</span>({
+  <span class="str">"description"</span>: <span class="str">"Test coverage analysis"</span>,
+  <span class="str">"prompt"</span>: <span class="str">"Zjisti pokrytí testy a navrhni chybějící testy"</span>,
+  <span class="str">"subagent_type"</span>: <span class="str">"Explore"</span>
+})</code></pre>
+
+        <h2>Sekvenční vs. paralelní</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Situace</th><th>Přístup</th><th>Proč</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Agenti pracují na nezávislých modulech</td>
+                <td><span class="badge badge-green">Paralelně</span></td>
+                <td>Žádná závislost, plný souběh</td>
+              </tr>
+              <tr>
+                <td>Agent B potřebuje výsledek agenta A</td>
+                <td><span class="badge badge-orange">Sekvenčně</span></td>
+                <td>Závislost na výstupu</td>
+              </tr>
+              <tr>
+                <td>Psaní do různých souborů</td>
+                <td><span class="badge badge-green">Paralelně</span></td>
+                <td>Žádný konflikt</td>
+              </tr>
+              <tr>
+                <td>Psaní do stejného souboru</td>
+                <td><span class="badge badge-orange">Sekvenčně</span></td>
+                <td>Race condition</td>
+              </tr>
+              <tr>
+                <td>Spouštění testů různých modulů</td>
+                <td><span class="badge badge-green">Paralelně</span></td>
+                <td>Nezávislé sady testů</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Pozadí (background) agenti</h2>
+        <p>Použijte <code>run_in_background: true</code> pro agenty, jejichž výsledek nepotřebujete okamžitě:</p>
+        <pre><code><span class="fn">Agent</span>({
+  <span class="str">"description"</span>: <span class="str">"Generování dokumentace"</span>,
+  <span class="str">"prompt"</span>: <span class="str">"Vygeneruj API dokumentaci pro všechny endpointy
+    v src/api/ a ulož ji do docs/api.md"</span>,
+  <span class="str">"run_in_background"</span>: <span class="kw">true</span>
+  <span class="cm">// Orchestrátor hned pokračuje s jinými úkoly.
+  // Notifikace přijde, jakmile agent skončí.</span>
+})</code></pre>
+
+        <h2>Praktický příklad: Migrace databáze</h2>
+        <pre><code><span class="cm"># KROK 1: Paralelní analýza (nezávislá)</span>
+Spusť souběžně:
+  - Agent A: "Analyzuj models/ a najdi všechny cizí klíče"
+  - Agent B: "Prozkoumej migrations/ a zjisti poslední verzi"
+  - Agent C: "Přečti schema.sql a identifikuj tabulky bez indexů"
+
+<span class="cm"># KROK 2 (po K1): Orchestrátor zpracuje výsledky a rozhodne</span>
+
+<span class="cm"># KROK 3: Paralelní implementace (nezávislé soubory)</span>
+Spusť souběžně:
+  - Agent D: "Vytvoř migrations/0042_add_indexes.py"
+  - Agent E: "Vytvoř migrations/0043_add_fk_constraints.py"
+  - Agent F: "Aktualizuj tests/test_db.py o nové testy"</code></pre>
+
+        <div class="nav-bottom">
+          <div id="nav-prev" class="nav-btn">
+            <div class="nav-label">← Předchozí</div>
+            <div class="nav-title"></div>
+          </div>
+          <div id="nav-next" class="nav-btn next">
+            <div class="nav-label">Další →</div>
+            <div class="nav-title"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════ -->
+      <!-- SEKCE: MULTI-AGENT ARCHITEKTURY -->
+      <!-- ══════════════════════════════════════════════════════ -->
+      <section class="section" id="multi-agent">
+        <div class="page-header">
+          <div class="page-icon">🕸️</div>
+          <div>
+            <h1>Multi-agent architektury</h1>
+            <p class="page-subtitle">Vzory pro koordinaci více agentů při komplexních softwarových úkolech</p>
+          </div>
+        </div>
+
+        <h2>Vzor 1: Hub & Spoke (Hvězda)</h2>
+        <p>Jeden orchestrátor koordinuje více specializovaných agentů. Nejjednodušší a nejčastější vzor.</p>
+        <pre><code><span class="cm">┌─────────────────────────────────────────┐
+│            ORCHESTRÁTOR                  │
+│      (hlavní Claude, plánuje)            │
+└──────────┬──────────┬──────────┬────────┘
+           │          │          │
+    ┌──────▼──┐ ┌─────▼──┐ ┌────▼──────┐
+    │ Agent A  │ │Agent B │ │  Agent C  │
+    │  Backend │ │Frontend│ │   Testy   │
+    └──────────┘ └────────┘ └───────────┘</span>
+
+<span class="cm"># Implementace:</span>
+<span class="fn">Agent</span>({ <span class="str">"description"</span>: <span class="str">"Backend agent"</span>, ... })   <span class="cm"># paralelně</span>
+<span class="fn">Agent</span>({ <span class="str">"description"</span>: <span class="str">"Frontend agent"</span>, ... })  <span class="cm"># paralelně</span>
+<span class="fn">Agent</span>({ <span class="str">"description"</span>: <span class="str">"Test agent"</span>, ... })     <span class="cm"># paralelně</span></code></pre>
+
+        <h2>Vzor 2: Pipeline (Řetězec)</h2>
+        <p>Výstup jednoho agenta je vstupem dalšího. Každý agent přidá hodnotu.</p>
+        <pre><code><span class="cm">Požadavek → [Agent A: Analýza] → [Agent B: Implementace]
+          → [Agent C: Review] → [Agent D: Testy] → Výsledek</span>
+
+<span class="cm"># Každý krok čeká na předchozí:</span>
+analysis = <span class="fn">Agent</span>({ <span class="str">"prompt"</span>: <span class="str">"Analyzuj požadavek a navrhni řešení"</span> })
+impl     = <span class="fn">Agent</span>({ <span class="str">"prompt"</span>: <span class="str">f"Implementuj: {analysis}"</span> })
+review   = <span class="fn">Agent</span>({ <span class="str">"prompt"</span>: <span class="str">f"Zkontroluj implementaci: {impl}"</span> })
+tests    = <span class="fn">Agent</span>({ <span class="str">"prompt"</span>: <span class="str">f"Napiš testy pro: {impl}"</span> })</code></pre>
+
+        <h2>Vzor 3: Map-Reduce</h2>
+        <p>Problém se rozdělí na části (map), paralelně zpracuje a výsledky se sloučí (reduce).</p>
+        <pre><code><span class="cm"># MAP fáze – paralelní zpracování 4 modulů najednou:</span>
+results = [
+  <span class="fn">Agent</span>({ <span class="str">"prompt"</span>: <span class="str">"Analyzuj modul auth"</span> }),    <span class="cm"># paralelně</span>
+  <span class="fn">Agent</span>({ <span class="str">"prompt"</span>: <span class="str">"Analyzuj modul billing"</span> }), <span class="cm"># paralelně</span>
+  <span class="fn">Agent</span>({ <span class="str">"prompt"</span>: <span class="str">"Analyzuj modul users"</span> }),   <span class="cm"># paralelně</span>
+  <span class="fn">Agent</span>({ <span class="str">"prompt"</span>: <span class="str">"Analyzuj modul api"</span> }),     <span class="cm"># paralelně</span>
+]
+
+<span class="cm"># REDUCE fáze – orchestrátor sloučí výsledky:</span>
+<span class="fn">Agent</span>({ <span class="str">"prompt"</span>: <span class="str">f"Slouč analýzy a vytvoř souhrnnou zprávu: {results}"</span> })</code></pre>
+
+        <h2>Vzor 4: Hierarchická síť</h2>
+        <p>Orchestrátor deleguje na sub-orchestrátory, kteří řídí vlastní tým agentů.</p>
+        <pre><code><span class="cm">        HLAVNÍ ORCHESTRÁTOR
+        /          |          \
+   Feature A    Feature B    Feature C
+  (sub-orch.)  (sub-orch.)  (sub-orch.)
+   /    \       /    \       /    \
+  A1    A2     B1    B2     C1    C2
+(workers)    (workers)    (workers)</span></code></pre>
+
+        <h2>Vzor 5: Spectre (Specialisté + Generalisté)</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Role</th><th>Specializace</th><th>Typické úkoly</th></tr></thead>
+            <tbody>
+              <tr><td><span class="badge badge-blue">Orchestrátor</span></td><td>Plánování a koordinace</td><td>Dekompozice problému, sbírání výsledků</td></tr>
+              <tr><td><span class="badge badge-green">Explore agent</span></td><td>Read-only průzkum kódu</td><td>Hledání souborů, analýza, grep</td></tr>
+              <tr><td><span class="badge badge-purple">Plan agent</span></td><td>Architektura a plánování</td><td>Návrh řešení, identifikace rizik</td></tr>
+              <tr><td><span class="badge badge-orange">Worker agent</span></td><td>Implementace</td><td>Psaní kódu, testy, dokumentace</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Komunikace mezi agenty</h2>
+        <div class="callout callout-warn">
+          <div class="callout-icon">⚠️</div>
+          <div class="callout-body">
+            <p>Agenti <strong>nesdílejí kontext</strong> – každý subagent dostane pouze to, co mu orchestrátor explicitně předá v promptu. Navrhujte prompty tak, aby byly <strong>soběstačné</strong>: obsahovaly vše, co agent potřebuje.</p>
+          </div>
+        </div>
+
+        <pre><code><span class="cm"># Špatně – agent nemá kontext:</span>
+<span class="fn">Agent</span>({ <span class="str">"prompt"</span>: <span class="str">"Oprav to"</span> })
+
+<span class="cm"># Dobře – agent dostane veškerý potřebný kontext:</span>
+<span class="fn">Agent</span>({
+  <span class="str">"description"</span>: <span class="str">"Oprava auth bug"</span>,
+  <span class="str">"prompt"</span>: <span class="str">"""
+    Oprav bug v souboru src/auth.py, funkci verify_token().
+    Bug: funkce vrací True i pro expirované tokeny.
+    Příčina: chybí kontrola pole 'exp' v JWT payload.
+    Požadavek: přidej kontrolu exp > time.time().
+    Testy jsou v tests/test_auth.py.
+    Spusť testy po opravě: pytest tests/test_auth.py -v
+  """</span>
+})</code></pre>
+
+        <div class="nav-bottom">
+          <div id="nav-prev" class="nav-btn">
+            <div class="nav-label">← Předchozí</div>
+            <div class="nav-title"></div>
+          </div>
+          <div id="nav-next" class="nav-btn next">
+            <div class="nav-label">Další →</div>
+            <div class="nav-title"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════ -->
+      <!-- SEKCE: SUPERVISOR VZORY -->
+      <!-- ══════════════════════════════════════════════════════ -->
+      <section class="section" id="supervisor">
+        <div class="page-header">
+          <div class="page-icon">👁️</div>
+          <div>
+            <h1>Supervisor vzory</h1>
+            <p class="page-subtitle">Orchestrátor jako inteligentní koordinátor, kontrolor kvality a plánovač</p>
+          </div>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-icon">ℹ️</div>
+          <div class="callout-body">
+            <p>Supervisor (orchestrátor) je agent zodpovědný za celkový výsledek. Dělí práci, deleguje ji, sbírá výsledky, ověřuje kvalitu a opravuje chyby. Jednotliví workeři (subagenti) nevědí nic o ostatních – vědí jen svůj úkol.</p>
+          </div>
+        </div>
+
+        <h2>Vzor 1: Supervisor s kontrolou kvality</h2>
+        <p>Po každé dávce workerů orchestrátor zkontroluje výsledky před dalším krokem.</p>
+        <pre><code><span class="cm"># 1. Deleguj práci</span>
+result_a = <span class="fn">Agent</span>({ <span class="str">"prompt"</span>: <span class="str">"Implementuj přihlašovací formulář"</span> })
+result_b = <span class="fn">Agent</span>({ <span class="str">"prompt"</span>: <span class="str">"Implementuj registrační formulář"</span> })
+
+<span class="cm"># 2. Zkontroluj výsledky (orchestrátor rozhoduje)</span>
+<span class="kw">if</span> <span class="fn">problems_found</span>(result_a):
+    <span class="cm"># 3. Pošli opravu zpět</span>
+    fix = <span class="fn">Agent</span>({ <span class="str">"prompt"</span>: <span class="str">f"Oprav tyto problémy: {problems}"</span> })
+
+<span class="cm"># 4. Pouze po úspěšné kontrole pokračuj</span>
+<span class="fn">Agent</span>({ <span class="str">"prompt"</span>: <span class="str">"Napiš testy pro oba formuláře"</span> })</code></pre>
+
+        <h2>Vzor 2: Critic-Reviser (Recenzent + Opravář)</h2>
+        <p>Jeden agent vytvoří, druhý zkritizuje, třetí opraví.</p>
+        <pre><code><span class="cm"># Fáze 1: Vytvoření</span>
+draft = <span class="fn">Agent</span>({
+  <span class="str">"description"</span>: <span class="str">"Návrh architektury"</span>,
+  <span class="str">"prompt"</span>: <span class="str">"Navrhni architekturu pro platební systém"</span>
+})
+
+<span class="cm"># Fáze 2: Nezávislá kritika</span>
+critique = <span class="fn">Agent</span>({
+  <span class="str">"description"</span>: <span class="str">"Bezpečnostní review"</span>,
+  <span class="str">"prompt"</span>: <span class="str">f"""
+    Zkritizuj tento návrh architektury z pohledu:
+    1. Bezpečnosti (OWASP Top 10)
+    2. Škálovatelnosti
+    3. Chybějících komponent
+    Návrh: {draft}
+  """</span>
+})
+
+<span class="cm"># Fáze 3: Revize na základě kritiky</span>
+final = <span class="fn">Agent</span>({
+  <span class="str">"description"</span>: <span class="str">"Finální architektura"</span>,
+  <span class="str">"prompt"</span>: <span class="str">f"Vylepši návrh {draft} na základě kritiky: {critique}"</span>
+})</code></pre>
+
+        <h2>Vzor 3: Tournament (Turnaj)</h2>
+        <p>Více agentů navrhne řešení, orchestrátor vybere nejlepší.</p>
+        <pre><code><span class="cm"># Paralelně – 3 různé přístupy k implementaci</span>
+solution_a = <span class="fn">Agent</span>({ <span class="str">"prompt"</span>: <span class="str">"Implementuj cache jako Redis hash"</span> })
+solution_b = <span class="fn">Agent</span>({ <span class="str">"prompt"</span>: <span class="str">"Implementuj cache jako LRU v paměti"</span> })
+solution_c = <span class="fn">Agent</span>({ <span class="str">"prompt"</span>: <span class="str">"Implementuj cache jako SQLite"</span> })
+
+<span class="cm"># Orchestrátor porovná a vybere</span>
+winner = <span class="fn">Agent</span>({
+  <span class="str">"prompt"</span>: <span class="str">f"""
+    Porovnej tato tři řešení cache:
+    A: {solution_a}
+    B: {solution_b}
+    C: {solution_c}
+
+    Kritéria: latence, paměťová náročnost, složitost.
+    Doporuč nejlepší a zdůvodni proč.
+  """</span>
+})</code></pre>
+
+        <h2>Vzor 4: Self-healing Supervisor</h2>
+        <p>Supervisor detekuje selhání a automaticky zotavuje systém.</p>
+        <pre><code><span class="cm"># 1. Worker spustí příkaz</span>
+result = <span class="fn">Agent</span>({ <span class="str">"prompt"</span>: <span class="str">"Spusť testy a vrať výsledek"</span> })
+
+<span class="cm"># 2. Supervisor vyhodnotí</span>
+<span class="kw">if</span> <span class="str">"FAILED"</span> <span class="kw">in</span> result:
+    <span class="cm"># 3. Diagnostický agent zjistí příčinu</span>
+    diagnosis = <span class="fn">Agent</span>({
+      <span class="str">"prompt"</span>: <span class="str">f"Analyzuj selhání testu a najdi příčinu: {result}"</span>
+    })
+
+    <span class="cm"># 4. Opravný agent provede fix</span>
+    fix = <span class="fn">Agent</span>({
+      <span class="str">"prompt"</span>: <span class="str">f"Oprav problém: {diagnosis}"</span>
+    })
+
+    <span class="cm"># 5. Verifikační agent ověří opravu</span>
+    verify = <span class="fn">Agent</span>({
+      <span class="str">"prompt"</span>: <span class="str">"Spusť testy znovu a potvrď, že jsou zelené"</span>
+    })</code></pre>
+
+        <h2>Vzor 5: Scrum Board</h2>
+        <p>Orchestrátor hraje roli Scrum mastera – vytvoří backlog, přidělí úkoly, sleduje progress.</p>
+        <pre><code><span class="cm"># Sprint plánování:</span>
+tasks = <span class="fn">Agent</span>({
+  <span class="str">"prompt"</span>: <span class="str">"Rozděl user story 'platební brána' na atomické úkoly"</span>
+})
+
+<span class="cm"># Paralelní sprint – každý worker dostane jeden task:</span>
+<span class="kw">for</span> task <span class="kw">in</span> tasks:
+    <span class="fn">Agent</span>({
+      <span class="str">"description"</span>: task.title,
+      <span class="str">"prompt"</span>: task.description,
+      <span class="str">"run_in_background"</span>: <span class="kw">true</span>
+    })
+
+<span class="cm"># Sprint review:</span>
+<span class="fn">Agent</span>({
+  <span class="str">"prompt"</span>: <span class="str">"Zkontroluj všechny dokončené tasky a vytvoř sprint report"</span>
+})</code></pre>
+
+        <h2>Doporučení pro dobré supervisory</h2>
+        <div class="callout callout-tip">
+          <div class="callout-icon">💡</div>
+          <div class="callout-body">
+            <ul>
+              <li><strong>Atomické úkoly</strong> – každý worker dostane jeden jasný, malý úkol</li>
+              <li><strong>Explicitní výstup</strong> – definujte formát výstupu (JSON, Markdown, kód)</li>
+              <li><strong>Nezávislost</strong> – workery by neměly záviset jeden na druhém tam, kde to není nutné</li>
+              <li><strong>Checkpointy</strong> – supervisor kontroluje po každé fázi, ne jen na konci</li>
+              <li><strong>Fallback</strong> – plánujte co dělat, když worker selže</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="nav-bottom">
+          <div id="nav-prev" class="nav-btn">
+            <div class="nav-label">← Předchozí</div>
+            <div class="nav-title"></div>
+          </div>
+          <div id="nav-next" class="nav-btn next">
+            <div class="nav-label">Další →</div>
+            <div class="nav-title"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════ -->
+      <!-- SEKCE: MCP SERVERY -->
+      <!-- ══════════════════════════════════════════════════════ -->
+      <section class="section" id="mcp">
+        <div class="page-header">
+          <div class="page-icon">🔌</div>
+          <div>
+            <h1>MCP Servery</h1>
+            <p class="page-subtitle">Model Context Protocol – rozšíření nástrojů Claudea o vlastní zdroje dat a akce</p>
+          </div>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-icon">ℹ️</div>
+          <div class="callout-body">
+            <p><strong>MCP (Model Context Protocol)</strong> je otevřený protokol pro připojení AI modelů k externím zdrojům. MCP server vystavuje nástroje (tools), zdroje (resources) a výzvy (prompts), které Claude může používat.</p>
+          </div>
+        </div>
+
+        <h2>Přidání MCP serveru</h2>
+
+        <h3>Přes příkazovou řádku</h3>
+        <pre><code><span class="cm"># Přidat globálně</span>
+<span class="prompt">$ </span>claude mcp add muj-server npx -y @mcp/muj-server
+
+<span class="cm"># Přidat pro projekt</span>
+<span class="prompt">$ </span>claude mcp add --scope project muj-server npx -y @mcp/muj-server</code></pre>
+
+        <h3>Ručně v settings.json</h3>
+        <pre><code>{
+  <span class="str">"mcpServers"</span>: {
+    <span class="str">"filesystem"</span>: {
+      <span class="str">"command"</span>: <span class="str">"npx"</span>,
+      <span class="str">"args"</span>: [<span class="str">"-y"</span>, <span class="str">"@modelcontextprotocol/server-filesystem"</span>, <span class="str">"/home/user"</span>]
+    },
+    <span class="str">"github"</span>: {
+      <span class="str">"command"</span>: <span class="str">"npx"</span>,
+      <span class="str">"args"</span>: [<span class="str">"-y"</span>, <span class="str">"@modelcontextprotocol/server-github"</span>],
+      <span class="str">"env"</span>: {
+        <span class="str">"GITHUB_TOKEN"</span>: <span class="str">"your-token"</span>
+      }
+    },
+    <span class="str">"postgres"</span>: {
+      <span class="str">"command"</span>: <span class="str">"npx"</span>,
+      <span class="str">"args"</span>: [<span class="str">"-y"</span>, <span class="str">"@modelcontextprotocol/server-postgres"</span>,
+               <span class="str">"postgresql://localhost/mydb"</span>]
+    }
+  }
+}</code></pre>
+
+        <h2>Populární MCP servery</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Server</th><th>Balíček</th><th>Co přidá</th></tr></thead>
+            <tbody>
+              <tr><td>Filesystem</td><td><code>@modelcontextprotocol/server-filesystem</code></td><td>Přístup k souborům mimo projekt</td></tr>
+              <tr><td>GitHub</td><td><code>@modelcontextprotocol/server-github</code></td><td>Issues, PRs, repozitáře</td></tr>
+              <tr><td>PostgreSQL</td><td><code>@modelcontextprotocol/server-postgres</code></td><td>Dotazování databáze přirozeným jazykem</td></tr>
+              <tr><td>SQLite</td><td><code>@modelcontextprotocol/server-sqlite</code></td><td>Lokální SQLite databáze</td></tr>
+              <tr><td>Puppeteer</td><td><code>@modelcontextprotocol/server-puppeteer</code></td><td>Ovládání prohlížeče</td></tr>
+              <tr><td>Slack</td><td><code>@modelcontextprotocol/server-slack</code></td><td>Čtení/psaní Slack zpráv</td></tr>
+              <tr><td>Memory</td><td><code>@modelcontextprotocol/server-memory</code></td><td>Perzistentní paměť (knowledge graph)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Správa MCP serverů</h2>
+        <pre><code><span class="cm"># Zobrazit všechny nainstalované servery</span>
+<span class="prompt">$ </span>claude mcp list
+
+<span class="cm"># Zobrazit detail serveru</span>
+<span class="prompt">$ </span>claude mcp get github
+
+<span class="cm"># Odebrat server</span>
+<span class="prompt">$ </span>claude mcp remove github</code></pre>
+
+        <h2>Vytvoření vlastního MCP serveru (Python)</h2>
+        <pre><code><span class="kw">from</span> mcp.server <span class="kw">import</span> Server
+<span class="kw">from</span> mcp.server.stdio <span class="kw">import</span> stdio_server
+<span class="kw">from</span> mcp.types <span class="kw">import</span> Tool, TextContent
+
+app = <span class="fn">Server</span>(<span class="str">"muj-server"</span>)
+
+<span class="kw">@</span>app.list_tools()
+<span class="kw">async def</span> <span class="fn">list_tools</span>():
+    <span class="kw">return</span> [<span class="fn">Tool</span>(
+        name=<span class="str">"nacti_konfiguraci"</span>,
+        description=<span class="str">"Přečte konfiguraci aplikace"</span>,
+        inputSchema={<span class="str">"type"</span>: <span class="str">"object"</span>, <span class="str">"properties"</span>: {}}
+    )]
+
+<span class="kw">@</span>app.call_tool()
+<span class="kw">async def</span> <span class="fn">call_tool</span>(name: str, arguments: dict):
+    <span class="kw">if</span> name == <span class="str">"nacti_konfiguraci"</span>:
+        <span class="kw">return</span> [<span class="fn">TextContent</span>(type=<span class="str">"text"</span>, text=<span class="fn">read_config</span>())]
+
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    <span class="kw">import</span> asyncio
+    asyncio.<span class="fn">run</span>(<span class="fn">stdio_server</span>(app))</code></pre>
+
+        <div class="nav-bottom">
+          <div id="nav-prev" class="nav-btn">
+            <div class="nav-label">← Předchozí</div>
+            <div class="nav-title"></div>
+          </div>
+          <div id="nav-next" class="nav-btn next">
+            <div class="nav-label">Další →</div>
+            <div class="nav-title"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════ -->
+      <!-- SEKCE: IDE INTEGRACE -->
+      <!-- ══════════════════════════════════════════════════════ -->
+      <section class="section" id="ide">
+        <div class="page-header">
+          <div class="page-icon">💻</div>
+          <div>
+            <h1>IDE Integrace</h1>
+            <p class="page-subtitle">Claude Code přímo ve VS Code a JetBrains IDE</p>
+          </div>
+        </div>
+
+        <h2>VS Code</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-content">
+              <h4>Instalace rozšíření</h4>
+              <p>Otevřete Extensions (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd>) a hledejte <strong>Claude Code</strong> od Anthropic.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-content">
+              <h4>Otevření Claude Code panelu</h4>
+              <p>Klikněte na ikonu Claude v Activity baru nebo použijte <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> → "Claude Code: Focus".</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-content">
+              <h4>Výhody integrace</h4>
+              <ul>
+                <li>Kliknutí na chybu v editoru ji automaticky sdílí s Claudem</li>
+                <li>Claude vidí váš aktuálně otevřený soubor</li>
+                <li>Výsledky se zobrazí jako diff přímo v editoru</li>
+                <li>Klávesové zkratky pro běžné akce</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <h2>JetBrains (IntelliJ, PyCharm, WebStorm…)</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-content">
+              <h4>Instalace pluginu</h4>
+              <p>Settings → Plugins → Marketplace → hledat <strong>Claude Code</strong>.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-content">
+              <h4>Konfigurace</h4>
+              <p>Settings → Tools → Claude Code → zadejte cestu k <code>claude</code> binárce nebo API klíč.</p>
+            </div>
+          </div>
+        </div>
+
+        <h2>Příkaz /ide</h2>
+        <p>V interaktivním REPL spusťte <code>/ide</code> pro připojení k aktuálně běžícímu IDE:</p>
+        <pre><code><span class="var">Vy:</span> /ide
+<span class="str">Nalezeno IDE: VS Code (workspace: ~/projects/muj-projekt)
+Claude Code je nyní propojen s VS Code.</span>
+
+<span class="var">Vy:</span> Oprav chybu v aktuálně otevřeném souboru
+<span class="cm">[Claude vidí soubor otevřený ve VS Code]</span></code></pre>
+
+        <h2>Webová aplikace</h2>
+        <p>Claude Code je dostupný také jako webová aplikace na <strong>claude.ai/code</strong> – bez nutnosti instalace, přímo v prohlížeči.</p>
+
+        <div class="nav-bottom">
+          <div id="nav-prev" class="nav-btn">
+            <div class="nav-label">← Předchozí</div>
+            <div class="nav-title"></div>
+          </div>
+          <div id="nav-next" class="nav-btn next">
+            <div class="nav-label">Další →</div>
+            <div class="nav-title"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════ -->
+      <!-- SEKCE: TIPY A TRIKY -->
+      <!-- ══════════════════════════════════════════════════════ -->
+      <section class="section" id="tipy">
+        <div class="page-header">
+          <div class="page-icon">💡</div>
+          <div>
+            <h1>Tipy a triky</h1>
+            <p class="page-subtitle">Best practices pro maximální produktivitu s Claude Code</p>
+          </div>
+        </div>
+
+        <h2>Produktivita</h2>
+
+        <h3>Spouštějte Claude v kořeni projektu</h3>
+        <p>Claude automaticky nahraje <code>CLAUDE.md</code>, přečte git historii a pochopí kontext. Vždy spouštějte <code>claude</code> z kořenového adresáře projektu, ne ze zanořeného adresáře.</p>
+
+        <h3>Používejte /compact aktivně</h3>
+        <p>Nečekejte na varování o plném kontextu. Po dokončení větší funkce spusťte <code>/compact</code> s instrukcí, co zachovat:</p>
+        <pre><code><span class="var">Vy:</span> /compact Zachovej kontext auth modulu a aktuální stav migrace databáze.</code></pre>
+
+        <h3>Pipe místo kopírování</h3>
+        <pre><code><span class="cm"># Analýza logu bez kopírování:</span>
+<span class="prompt">$ </span>tail -100 /var/log/app.log | claude -p "najdi anomálie"
+
+<span class="cm"># Review diff:</span>
+<span class="prompt">$ </span>git diff | claude -p "zkontroluj bezpečnostní problémy"
+
+<span class="cm"># Analýza výstupu testů:</span>
+<span class="prompt">$ </span>pytest --tb=long 2>&1 | claude -p "vysvětli selhání testů"</code></pre>
+
+        <h2>Bezpečnost</h2>
+
+        <div class="callout callout-danger">
+          <div class="callout-icon">🔴</div>
+          <div class="callout-body">
+            <p><strong>Nikdy neposkytujte Claudovi API klíče, hesla ani tajné tokeny</strong> přímo v textu. Používejte proměnné prostředí přes <code>env</code> v settings.json nebo načítejte ze souborů.</p>
+          </div>
+        </div>
+
+        <h3>Princip nejmenšího oprávnění</h3>
+        <p>Povolujte jen příkazy, které skutečně potřebujete:</p>
+        <pre><code><span class="cm"># Dobré – specifická povolení:</span>
+<span class="str">"allow"</span>: [<span class="str">"Bash(npm test)"</span>, <span class="str">"Bash(npm run lint)"</span>]
+
+<span class="cm"># Rizikové – příliš obecné:</span>
+<span class="str">"allow"</span>: [<span class="str">"Bash(*)"</span>]</code></pre>
+
+        <h2>Kvalita kódu</h2>
+
+        <h3>Poproste o review před implementací</h3>
+        <pre><code><span class="var">Vy:</span> Plánuji přidat platební bránu Stripe. Jaký je tvůj navrhovaný
+     přístup a jaká jsou rizika? Zatím nic neimplementuj.</code></pre>
+
+        <h3>Iterativní přístup</h3>
+        <p>Raději více malých kroků než jeden velký. Claude snáze ověří a opraví menší změny.</p>
+
+        <h2>Multi-agent best practices</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>✅ Dělej</th><th>❌ Nedělej</th></tr></thead>
+            <tbody>
+              <tr><td>Dávej agentům soběstačné prompty</td><td>Předpokládat, že agent zná kontext</td></tr>
+              <tr><td>Definuj formát výstupu agenta</td><td>Nechávat výstup libovolný</td></tr>
+              <tr><td>Paralelizuj nezávislé úkoly</td><td>Sekvenčně zpracovávat, kde jde paralelně</td></tr>
+              <tr><td>Používej Explore typ pro průzkum</td><td>Používat general-purpose pro prosté čtení</td></tr>
+              <tr><td>Kontroluj výsledky po každé fázi</td><td>Slepe spouštět celý pipeline</td></tr>
+              <tr><td>Plánovací agent před implementací</td><td>Rovnou implementovat bez návrhu</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Časté chyby</h2>
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-emoji">🚫</div>
+            <h4>Vague prompty</h4>
+            <p>„Udělej to lepší" nestačí. Vždy specifikujte co, kde a jak.</p>
+          </div>
+          <div class="card">
+            <div class="card-emoji">🚫</div>
+            <h4>Příliš velké úkoly</h4>
+            <p>Jeden prompt na celý projekt = chaos. Rozdělte na fáze.</p>
+          </div>
+          <div class="card">
+            <div class="card-emoji">🚫</div>
+            <h4>Ignorování /compact</h4>
+            <p>Plný kontext = horší výsledky. Kompaktujte pravidelně.</p>
+          </div>
+          <div class="card">
+            <div class="card-emoji">🚫</div>
+            <h4>Chybějící CLAUDE.md</h4>
+            <p>Bez projektových instrukcí Claude neví o vašich konvencích.</p>
+          </div>
+        </div>
+
+        <h2>Modely a jejich použití</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Model</th><th>Kdy použít</th></tr></thead>
+            <tbody>
+              <tr><td><code>claude-opus-4-7</code></td><td>Komplexní architektura, těžká analýza, multi-agent orchestrace</td></tr>
+              <tr><td><code>claude-sonnet-4-6</code></td><td>Každodenní vývoj, psaní kódu, review (výchozí)</td></tr>
+              <tr><td><code>claude-haiku-4-5</code></td><td>Rychlé jednoduché úkoly, subagenti pro průzkum, nízká latence</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon">💡</div>
+          <div class="callout-body">
+            <p><strong>Tip pro multi-agent systémy:</strong> Orchestrátor může být Opus (nejlepší plánování), workeri Haiku (nejrychlejší a nejlevnější), a implementační agenti Sonnet (nejlepší poměr cena/výkon).</p>
+          </div>
+        </div>
+
+        <div class="nav-bottom">
+          <div id="nav-prev" class="nav-btn">
+            <div class="nav-label">← Předchozí</div>
+            <div class="nav-title"></div>
+          </div>
+          <div id="nav-next" class="nav-btn next" style="display:none;"></div>
+        </div>
+      </section>
+
+    </div><!-- /content -->
+  </main>
+</div><!-- /layout -->
+
+<script src="js/script.js"></script>
+<script>
+  // Progress bar on scroll
+  window.addEventListener('scroll', () => {
+    const el = document.documentElement;
+    const scrolled = el.scrollTop || document.body.scrollTop;
+    const total = el.scrollHeight - el.clientHeight;
+    const pct = total > 0 ? (scrolled / total) * 100 : 0;
+    document.getElementById('progress-bar').style.width = pct + '%';
+  });
+</script>
+</body>
+</html>
