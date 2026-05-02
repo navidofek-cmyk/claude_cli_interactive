@@ -56,6 +56,7 @@
       <a class="sidebar-link" data-section="uvod"><span class="emoji">🏠</span> Úvod</a>
       <a class="sidebar-link" data-section="instalace"><span class="emoji">⚙️</span> Instalace</a>
       <a class="sidebar-link" data-section="prvni-kroky"><span class="emoji">🚀</span> První kroky</a>
+      <a class="sidebar-link" data-section="obnoveni-sezeni"><span class="emoji">🔄</span> Obnovení sezení</a>
     </div>
 
     <div class="sidebar-section">
@@ -119,10 +120,15 @@
             <div class="oi-title">Instalace</div>
             <div class="oi-desc">npm, přihlášení, ověření</div>
           </div>
+          <div class="overview-item" data-target="obnoveni-sezeni">
+            <div class="oi-emoji">🔄</div>
+            <div class="oi-title">Obnovení sezení</div>
+            <div class="oi-desc">--continue, --resume, SendMessage</div>
+          </div>
           <div class="overview-item" data-target="slash-prikazy">
             <div class="oi-emoji">📟</div>
             <div class="oi-title">Slash příkazy</div>
-            <div class="oi-desc">/help, /clear, /compact…</div>
+            <div class="oi-desc">/help, /clear, /compact, /vim…</div>
           </div>
           <div class="overview-item" data-target="nastroje">
             <div class="oi-emoji">🔧</div>
@@ -396,6 +402,167 @@ Toto je Flask aplikace se třemi moduly...</code></pre>
       </section>
 
       <!-- ══════════════════════════════════════════════════════ -->
+      <!-- SEKCE: OBNOVENÍ SEZENÍ -->
+      <!-- ══════════════════════════════════════════════════════ -->
+      <section class="section" id="obnoveni-sezeni">
+        <div class="page-header">
+          <div class="page-icon">🔄</div>
+          <div>
+            <h1>Obnovení sezení</h1>
+            <p class="page-subtitle">Jak navázat na předchozí konverzaci s Claudem – flags, session ID a SendMessage</p>
+          </div>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-icon">ℹ️</div>
+          <div class="callout-body">
+            <p>Claude Code ukládá historii všech sezení lokálně. Díky tomu lze kdykoli navázat na přerušenou práci – i po restartu počítače nebo zavření terminálu.</p>
+          </div>
+        </div>
+
+        <h2>Rychlé navázání – poslední sezení</h2>
+        <p>Nejběžnější případ: chcete pokračovat tam, kde jste skončili.</p>
+        <pre><code><span class="cm"># Zkratka: pokračovat v posledním sezení</span>
+<span class="prompt">$ </span>claude --continue
+<span class="cm"># nebo kratší forma:</span>
+<span class="prompt">$ </span>claude -c
+
+<span class="str">Obnovuji sezení z 2026-05-02 14:32...
+Kontext: 12 450 tokenů
+Poslední zpráva: "Přidej endpoint /api/export"
+
+Pokračuji kde jsme skončili. Jak mohu pomoci?</span></code></pre>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon">💡</div>
+          <div class="callout-body">
+            <p><code>claude -c</code> je nejrychlejší způsob jak ráno navázat na včerejší práci. Nemusíte Claudovi znovu vysvětlovat kontext projektu.</p>
+          </div>
+        </div>
+
+        <h2>Navázání na konkrétní sezení</h2>
+        <p>Pokud máte více projektů nebo chcete navázat na starší sezení (ne poslední), použijte session ID.</p>
+
+        <h3>Krok 1: Zjistěte session ID</h3>
+        <pre><code><span class="cm"># Výpis posledních sezení:</span>
+<span class="prompt">$ </span>claude --list-sessions
+
+<span class="str">ID                                    Datum               Projekt            Zprávy
+────────────────────────────────────  ──────────────────  ─────────────────  ───────
+a1b2c3d4-e5f6-7890-abcd-ef1234567890  2026-05-02 14:32    muj-projekt        47
+f9e8d7c6-b5a4-3210-fedc-ba9876543210  2026-05-01 09:15    ecommerce-api      23
+12345678-9abc-def0-1234-567890abcdef  2026-04-30 16:44    data-pipeline      61</span></code></pre>
+
+        <h3>Krok 2: Navažte pomocí ID</h3>
+        <pre><code><span class="prompt">$ </span>claude --resume a1b2c3d4-e5f6-7890-abcd-ef1234567890
+<span class="cm"># nebo kratší forma:</span>
+<span class="prompt">$ </span>claude -r a1b2c3d4-e5f6-7890-abcd-ef1234567890</code></pre>
+
+        <h2>Přehled všech flag pro sezení</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Flag (dlouhý)</th><th>Zkratka</th><th>Popis</th></tr></thead>
+            <tbody>
+              <tr><td><code>--continue</code></td><td><code>-c</code></td><td>Navázat na poslední sezení</td></tr>
+              <tr><td><code>--resume &lt;id&gt;</code></td><td><code>-r &lt;id&gt;</code></td><td>Navázat na konkrétní sezení podle ID</td></tr>
+              <tr><td><code>--list-sessions</code></td><td>—</td><td>Vypsat všechna uložená sezení</td></tr>
+              <tr><td><code>--new</code></td><td>—</td><td>Vynutit nové sezení (ignoruje --continue)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Kde jsou sezení uložena</h2>
+        <pre><code><span class="cm"># Sezení jsou uložena v:</span>
+~/.claude/projects/&lt;projekt-hash&gt;/
+
+<span class="cm"># Každé sezení = jeden soubor:</span>
+~/.claude/projects/abc123.../
+  ├── a1b2c3d4.jsonl   <span class="cm"># sezení 1</span>
+  ├── f9e8d7c6.jsonl   <span class="cm"># sezení 2</span>
+  └── memory/          <span class="cm"># paměťové soubory projektu</span></code></pre>
+
+        <div class="callout callout-warn">
+          <div class="callout-icon">⚠️</div>
+          <div class="callout-body">
+            <p>Sezení jsou vázána na <strong>pracovní adresář</strong>. Pokud spustíte <code>claude -c</code> z jiného adresáře, obnoví se sezení pro ten adresář, ne pro váš projekt.</p>
+          </div>
+        </div>
+
+        <h2>Použití s neinteraktivním módem</h2>
+        <p>Flags <code>--continue</code> a <code>--resume</code> fungují i v pipeline módu:</p>
+        <pre><code><span class="cm"># Navázat na poslední sezení a poslat nový příkaz (bez interaktivního REPL):</span>
+<span class="prompt">$ </span>claude -c -p "Napiš testy pro funkci, kterou jsme implementovali"
+
+<span class="cm"># Navázat na konkrétní sezení a zpracovat soubor:</span>
+<span class="prompt">$ </span>cat error.log | claude -r a1b2c3d4 -p "Co se stalo?"</code></pre>
+
+        <h2>SendMessage – pokračování běžícího agenta</h2>
+        <p>V Agent SDK lze pokračovat v dříve spuštěném (nebo ještě běžícím) agentovi pomocí <code>SendMessage</code>. Tím se agent obnoví s plným kontextem předchozích volání.</p>
+        <pre><code><span class="cm"># Při prvním spuštění agent dostane ID nebo jméno:</span>
+<span class="fn">Agent</span>({
+  <span class="str">"description"</span>: <span class="str">"Dlouhodobý analytický agent"</span>,
+  <span class="str">"prompt"</span>: <span class="str">"Začni analyzovat codebase..."</span>,
+  <span class="str">"run_in_background"</span>: <span class="kw">true</span>
+})
+
+<span class="cm"># Později – pokračovat v témže agentovi (neztrácí kontext):</span>
+<span class="fn">SendMessage</span>({
+  <span class="str">"to"</span>: <span class="str">"Dlouhodobý analytický agent"</span>,
+  <span class="str">"message"</span>: <span class="str">"Zaměř se nyní na bezpečnostní problémy"</span>
+})</code></pre>
+
+        <div class="callout callout-info">
+          <div class="callout-icon">ℹ️</div>
+          <div class="callout-body">
+            <p><strong>SendMessage vs nový Agent</strong>: <code>SendMessage</code> pokračuje v existujícím agentovi – ten zná celý předchozí kontext. Nový <code>Agent()</code> začíná od nuly a musí dostat veškerý kontext v promptu.</p>
+          </div>
+        </div>
+
+        <h2>Strategie pro dlouhé projekty</h2>
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-emoji">📅</div>
+            <h4>Denní workflow</h4>
+            <p>Každé ráno: <code>claude -c</code> pro okamžité navázání. Claude ví, co bylo uděláno včera.</p>
+          </div>
+          <div class="card">
+            <div class="card-emoji">🔀</div>
+            <h4>Více projektů</h4>
+            <p>Spouštějte <code>claude</code> vždy z kořene daného projektu. Každý projekt má vlastní historii sezení.</p>
+          </div>
+          <div class="card">
+            <div class="card-emoji">💾</div>
+            <h4>Záchytné body</h4>
+            <p>Před velkou změnou zadejte Claudovi shrnutí stavu: <code>/compact Uložit: aktuální stav, co bylo dokončeno, co zbývá</code></p>
+          </div>
+          <div class="card">
+            <div class="card-emoji">🏷️</div>
+            <h4>CLAUDE.md jako paměť</h4>
+            <p>Důležitá rozhodnutí zapisujte do CLAUDE.md – přetrvají i po smazání sezení.</p>
+          </div>
+        </div>
+
+        <h2>Automatické obnovení sezení</h2>
+        <p>Přidejte alias do <code>~/.bashrc</code> nebo <code>~/.zshrc</code> pro ještě rychlejší navázání:</p>
+        <pre><code><span class="cm"># ~/.bashrc nebo ~/.zshrc</span>
+<span class="kw">alias</span> <span class="var">cl</span>=<span class="str">'claude -c'</span>           <span class="cm"># pokračovat v posledním sezení</span>
+<span class="kw">alias</span> <span class="var">cln</span>=<span class="str">'claude --new'</span>      <span class="cm"># vždy nové sezení</span>
+<span class="kw">alias</span> <span class="var">cls</span>=<span class="str">'claude --list-sessions'</span>  <span class="cm"># přehled sezení</span></code></pre>
+        <p>Po přidání aliases stačí napsat <code>cl</code> pro okamžité navázání na práci.</p>
+
+        <div class="nav-bottom">
+          <div id="nav-prev" class="nav-btn">
+            <div class="nav-label">← Předchozí</div>
+            <div class="nav-title"></div>
+          </div>
+          <div id="nav-next" class="nav-btn next">
+            <div class="nav-label">Další →</div>
+            <div class="nav-title"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════ -->
       <!-- SEKCE: SLASH PŘÍKAZY -->
       <!-- ══════════════════════════════════════════════════════ -->
       <section class="section" id="slash-prikazy">
@@ -403,72 +570,253 @@ Toto je Flask aplikace se třemi moduly...</code></pre>
           <div class="page-icon">📟</div>
           <div>
             <h1>Slash příkazy</h1>
-            <p class="page-subtitle">Vestavěné příkazy začínající lomítkem pro správu sezení</p>
+            <p class="page-subtitle">Kompletní přehled vestavěných příkazů začínajících lomítkem</p>
           </div>
         </div>
 
         <div class="callout callout-info">
           <div class="callout-icon">ℹ️</div>
           <div class="callout-body">
-            <p>Slash příkazy fungují pouze v interaktivním REPL režimu. Zadejte <code>/help</code> pro aktuální seznam všech dostupných příkazů.</p>
+            <p>Slash příkazy fungují pouze v interaktivním REPL režimu. Zadejte <code>/help</code> pro aktuální seznam příkazů – nové verze Claude Code přidávají další.</p>
           </div>
         </div>
 
-        <h2>Správa sezení</h2>
+        <h2>📋 Kompletní přehled</h2>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Příkaz</th><th>Popis</th></tr></thead>
+            <thead><tr><th>Příkaz</th><th>Zkratka</th><th>Co dělá</th></tr></thead>
             <tbody>
-              <tr><td><code>/help</code></td><td>Zobrazí všechny dostupné příkazy</td></tr>
-              <tr><td><code>/clear</code></td><td>Vymaže kontext sezení (začne nové)</td></tr>
-              <tr><td><code>/compact</code></td><td>Shrne historii a uvolní kontext</td></tr>
-              <tr><td><code>/compact [instrukce]</code></td><td>Shrnutí s vlastními pokyny, co zachovat</td></tr>
-              <tr><td><code>/cost</code></td><td>Zobrazí spotřebu tokenů a cenu sezení</td></tr>
-              <tr><td><code>/status</code></td><td>Stav připojení, model, kontext</td></tr>
+              <tr><td><code>/help</code></td><td>—</td><td>Zobrazí všechny dostupné příkazy s popisem</td></tr>
+              <tr><td><code>/clear</code></td><td>—</td><td>Smaže celý kontext sezení, začne od nuly</td></tr>
+              <tr><td><code>/compact</code></td><td>—</td><td>Shrne historii a uvolní místo v kontextu</td></tr>
+              <tr><td><code>/cost</code></td><td>—</td><td>Zobrazí spotřebu tokenů a odhadovanou cenu</td></tr>
+              <tr><td><code>/status</code></td><td>—</td><td>Model, kontext, stav připojení, verze</td></tr>
+              <tr><td><code>/config</code></td><td>—</td><td>Interaktivní menu pro nastavení</td></tr>
+              <tr><td><code>/doctor</code></td><td>—</td><td>Diagnostika instalace, klíčů, připojení</td></tr>
+              <tr><td><code>/model</code></td><td>—</td><td>Zobrazí / přepne model za běhu sezení</td></tr>
+              <tr><td><code>/memory</code></td><td>—</td><td>Správa paměťových souborů</td></tr>
+              <tr><td><code>/init</code></td><td>—</td><td>Vygeneruje CLAUDE.md pro aktuální projekt</td></tr>
+              <tr><td><code>/review</code></td><td>—</td><td>Multi-agent code review aktuální git větve</td></tr>
+              <tr><td><code>/ide</code></td><td>—</td><td>Připojení k běžícímu VS Code / JetBrains</td></tr>
+              <tr><td><code>/login</code></td><td>—</td><td>Přihlášení nebo výměna účtu</td></tr>
+              <tr><td><code>/logout</code></td><td>—</td><td>Odhlášení (vymaže uložené přihlašovací údaje)</td></tr>
+              <tr><td><code>/vim</code></td><td>—</td><td>Přepne vstupní pole do vim módu</td></tr>
+              <tr><td><code>/terminal-setup</code></td><td>—</td><td>Nakonfiguruje terminál pro správné zobrazení</td></tr>
+              <tr><td><code>/bug</code></td><td>—</td><td>Otevře formulář pro nahlášení chyby Anthropicu</td></tr>
             </tbody>
           </table>
         </div>
 
-        <h2>Konfigurace a nastavení</h2>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Příkaz</th><th>Popis</th></tr></thead>
-            <tbody>
-              <tr><td><code>/config</code></td><td>Otevře interaktivní konfiguraci</td></tr>
-              <tr><td><code>/doctor</code></td><td>Diagnostika instalace a připojení</td></tr>
-              <tr><td><code>/model</code></td><td>Přepne model (opus/sonnet/haiku)</td></tr>
-            </tbody>
-          </table>
+        <h2>/help – Nápověda</h2>
+        <p>Kdykoliv si nejste jistí, co příkaz dělá, použijte <code>/help</code>. Zobrazí aktuální seznam všech příkazů přímo v sezení bez nutnosti otevírat dokumentaci.</p>
+        <pre><code><span class="var">Vy:</span> /help
+
+<span class="str">Dostupné příkazy:
+  /help          Zobrazí tuto nápovědu
+  /clear         Smaže kontext sezení
+  /compact       Shrne historii konverzace
+  /cost          Zobrazí cenu sezení
+  ...</span></code></pre>
+
+        <h2>/clear – Reset sezení</h2>
+        <p>Smaže celou historii konverzace a začne čistý kontext. Claude zapomene vše z aktuálního sezení. Vhodné pro přechod na jiný nesouvisející úkol.</p>
+        <div class="callout callout-warn">
+          <div class="callout-icon">⚠️</div>
+          <div class="callout-body">
+            <p><code>/clear</code> nevratně smaže historii sezení v paměti. Soubory na disku zůstávají nedotčeny. Pokud chcete kontext pouze zmenšit (ne smazat), použijte <code>/compact</code>.</p>
+          </div>
         </div>
 
-        <h2>Paměť a kontext</h2>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Příkaz</th><th>Popis</th></tr></thead>
-            <tbody>
-              <tr><td><code>/memory</code></td><td>Zobrazí / upraví soubory paměti</td></tr>
-              <tr><td><code>/init</code></td><td>Vygeneruje CLAUDE.md pro aktuální projekt</td></tr>
-            </tbody>
-          </table>
-        </div>
+        <h2>/compact – Úspora kontextu</h2>
+        <p>Jeden z nejdůležitějších příkazů. Claude shrne historii konverzace do hutnějšího přehledu a tím uvolní místo pro nové úkoly – aniž byste ztratili důležitý kontext.</p>
 
-        <h2>Kód a revize</h2>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Příkaz</th><th>Popis</th></tr></thead>
-            <tbody>
-              <tr><td><code>/review</code></td><td>Spustí code review aktuální větve</td></tr>
-              <tr><td><code>/ide</code></td><td>Správa IDE integrace</td></tr>
-            </tbody>
-          </table>
-        </div>
+        <h3>Základní použití</h3>
+        <pre><code><span class="var">Vy:</span> /compact</code></pre>
+        <p>Claude automaticky rozhodne, co je důležité zachovat.</p>
+
+        <h3>S vlastními instrukcemi</h3>
+        <pre><code><span class="var">Vy:</span> /compact Zachovej: stav migrace databáze, rozhodnutí o architektuře
+auth modulu, seznam TODO pro billing.</code></pre>
+        <p>Říkáte Claudovi přesně, co má do shrnutí zahrnout. Vše ostatní zkomprimuje.</p>
+
+        <h3>Kdy compact použít</h3>
+        <ul>
+          <li>Po dokončení větší funkce nebo refaktoringu</li>
+          <li>Před přechodem na jiný modul ve stejném projektu</li>
+          <li>Když vidíte varování o zaplnění kontextu</li>
+          <li>Preventivně každých ~30 výměn zpráv při intenzivní práci</li>
+        </ul>
+
+        <h2>/cost – Přehled spotřeby</h2>
+        <p>Zobrazí kolik tokenů jste v aktuálním sezení spotřebovali a odhadovanou cenu.</p>
+        <pre><code><span class="var">Vy:</span> /cost
+
+<span class="str">Sezení:
+  Vstupní tokeny:   45 230
+  Výstupní tokeny:  12 890
+  Cache hits:       38 100
+  Odhadovaná cena:  ~$0.18</span></code></pre>
+        <p>Užitečné pro sledování nákladů při intenzivním multi-agent použití nebo dlouhých sezeních.</p>
+
+        <h2>/status – Stav sezení</h2>
+        <p>Přehled aktuálního stavu: model, využití kontextu, stav připojení k API, přihlášený účet.</p>
+        <pre><code><span class="var">Vy:</span> /status
+
+<span class="str">Model:       claude-sonnet-4-6
+Kontext:     28 450 / 200 000 tokenů (14 %)
+Připojení:   ✓ Anthropic API
+Účet:        user@example.com (Pro)
+Verze CLI:   1.x.x</span></code></pre>
+
+        <h2>/config – Interaktivní konfigurace</h2>
+        <p>Otevře textové menu pro změnu nastavení bez ruční editace JSON souborů.</p>
+        <pre><code><span class="var">Vy:</span> /config
+
+<span class="str">Nastavení Claude Code
+─────────────────────
+1. Model:          claude-sonnet-4-6
+2. Téma:           Tmavé
+3. Oprávnění:      Zobrazit / upravit
+4. Hooks:          Zobrazit / upravit
+5. API klíč:       Změnit
+
+Zvolte číslo možnosti:</span></code></pre>
+
+        <h2>/doctor – Diagnostika</h2>
+        <p>Zkontroluje celé prostředí Claude Code a vypíše seznam problémů.</p>
+        <pre><code><span class="var">Vy:</span> /doctor
+
+<span class="flag">✓</span> CLI nainstalováno  (@anthropic-ai/claude-code 1.x.x)
+<span class="flag">✓</span> Node.js 22.x
+<span class="flag">✓</span> Přihlášen jako user@example.com
+<span class="flag">✓</span> API připojení OK
+<span class="flag">✓</span> CLAUDE.md nalezen v projektu
+<span class="red">✗</span> settings.json: neplatný JSON na řádku 14</code></pre>
+        <p>Spusťte jako první krok při ladění jakéhokoliv problému s Claude Code.</p>
+
+        <h2>/model – Přepnutí modelu</h2>
+        <p>Změní model <strong>za běhu sezení</strong>, aniž byste museli zavírat a znovu otevírat Claude Code. Kontext zůstane zachován.</p>
+        <pre><code><span class="var">Vy:</span> /model
+<span class="str">Aktuální model: claude-sonnet-4-6
+Dostupné modely:
+  1. claude-opus-4-7      (nejschopnější)
+  2. claude-sonnet-4-6    (aktuální)
+  3. claude-haiku-4-5     (nejrychlejší)</span>
+
+<span class="var">Vy:</span> /model claude-opus-4-7
+<span class="str">Model přepnut na claude-opus-4-7</span></code></pre>
+        <p>Typické použití: přepnout na Opus pro složitou architektonickou diskuzi, pak zpět na Sonnet pro implementaci.</p>
+
+        <h2>/memory – Správa paměti</h2>
+        <p>Claude Code si ukládá informace o uživateli a projektu do souborů v <code>~/.claude/projects/</code>. Příkaz <code>/memory</code> umožní tuto paměť prohlížet a upravovat.</p>
+        <pre><code><span class="var">Vy:</span> /memory
+
+<span class="str">Paměťové soubory:
+  ~/.claude/CLAUDE.md               (globální instrukce)
+  .claude/memory/user_role.md       (váš profil)
+  .claude/memory/project_state.md   (stav projektu)
+
+Akce:
+  1. Zobrazit soubor
+  2. Upravit soubor
+  3. Přidat novou paměť</span></code></pre>
+
+        <h2>/init – Generování CLAUDE.md</h2>
+        <p>Nechá Claude prozkoumat aktuální projekt a automaticky vygenerovat <code>CLAUDE.md</code> se strukturou projektu, příkazy a konvencemi.</p>
+        <pre><code><span class="var">Vy:</span> /init
+<span class="cm"># Claude projde soubory, package.json / pyproject.toml,
+# git historii a vytvoří CLAUDE.md přizpůsobený projektu.</span>
+<span class="str">✓ Vygenerován CLAUDE.md (234 řádků)
+  - Detekován typ: Python / FastAPI
+  - Přidány testovací příkazy
+  - Přidána struktura adresářů
+  - Přidány konvence z git historie</span></code></pre>
+
+        <h2>/review – Code review</h2>
+        <p>Spustí multi-agent code review všech změn na aktuální git větvi oproti <code>main</code> (nebo zadané větvi).</p>
+        <pre><code><span class="var">Vy:</span> /review
+<span class="cm"># Agents zkontrolují: bezpečnost, výkon, čitelnost,
+# pokrytí testy, konvence projektu</span>
+<span class="str">Review větve feature/payment-gateway vs main:
+  ✓ Bezpečnost: žádné zranitelnosti
+  ⚠ Výkon: N+1 dotaz v billing.py:45
+  ✓ Testy: pokrytí 87 %
+  ✗ Konvence: 3 funkce bez type hints</span></code></pre>
+
+        <h2>/ide – Propojení s editorem</h2>
+        <p>Připojí Claude Code k aktuálně běžícímu VS Code nebo JetBrains IDE. Po propojení Claude vidí otevřený soubor, pozici kurzoru a chybové hlášky přímo z editoru.</p>
+        <pre><code><span class="var">Vy:</span> /ide
+<span class="str">Hledám běžící IDE...
+✓ Nalezeno: VS Code (workspace: ~/projects/muj-projekt)
+  Claude Code je propojen. Vidím aktuální soubor: src/auth.py</span>
+
+<span class="var">Vy:</span> Oprav chybu na řádku 45
+<span class="cm"># Claude přečte konkrétní řádek přímo z editoru</span></code></pre>
+
+        <h2>/vim – Vim vstupní mód</h2>
+        <p>Přepne vstupní řádek do vim módu. Pro uživatele zvyklé na vim pohyby (<kbd>hjkl</kbd>, <kbd>w</kbd>, <kbd>b</kbd>, <kbd>0</kbd>, <kbd>$</kbd>, <kbd>dd</kbd>…) při editaci dlouhých promptů.</p>
+        <pre><code><span class="var">Vy:</span> /vim
+<span class="str">Vim mód zapnut. ESC pro příkazový mód, i pro vkládání.</span></code></pre>
+
+        <h2>/login a /logout</h2>
+        <pre><code><span class="cm"># Přepnutí na jiný účet nebo obnovení přihlášení:</span>
+<span class="var">Vy:</span> /logout
+<span class="str">Odhlášen. Přihlašovací údaje smazány.</span>
+
+<span class="var">Vy:</span> /login
+<span class="str">Vyberte způsob přihlášení:
+  1. Claude.ai (Pro/Max účet)
+  2. Anthropic API klíč
+  3. Amazon Bedrock
+  4. Google Vertex AI</span></code></pre>
+
+        <h2>/terminal-setup</h2>
+        <p>Nakonfiguruje váš terminál pro správné zobrazení Claude Code – zejména Unicode znaky, barvy a šířku výstupu. Spusťte pokud vidíte rozsypaná písmenka nebo špatné zarovnání.</p>
+
+        <h2>/bug – Nahlášení chyby</h2>
+        <p>Otevře předvyplněný formulář pro nahlášení chyby přímo týmu Anthropic, včetně anonymizovaných diagnostických dat.</p>
 
         <h2>Vlastní slash příkazy</h2>
-        <p>Můžete si definovat vlastní slash příkazy pomocí souborů v <code>.claude/commands/</code>:</p>
-        <pre><code><span class="cm"># .claude/commands/deploy.md</span>
-Zkontroluj, zda všechny testy prošly, pak vytvoř commit
-s aktuálními změnami a pushni do větve main.</code></pre>
-        <p>Příkaz pak spustíte jako <code>/deploy</code>.</p>
+        <p>Vytvořte soubory <code>.claude/commands/nazev.md</code> a budou dostupné jako <code>/nazev</code>. Název souboru = název příkazu.</p>
+
+        <h3>Jednoduché příkazy</h3>
+        <pre><code><span class="cm"># .claude/commands/testy.md</span>
+Spusť všechny testy příkazem `pytest tests/ -v --tb=short`.
+Pokud nějaké selžou, vysvětli příčinu a navrhni opravu.</code></pre>
+        <pre><code><span class="var">Vy:</span> /testy</code></pre>
+
+        <h3>Příkazy s argumenty (<code>$ARGUMENTS</code>)</h3>
+        <pre><code><span class="cm"># .claude/commands/feature.md</span>
+Vytvoř novou feature větev pro: $ARGUMENTS
+
+Kroky:
+1. git checkout -b feature/$ARGUMENTS
+2. Připrav prázdný commit s názvem větve
+3. Vypiš co je potřeba implementovat</code></pre>
+        <pre><code><span class="var">Vy:</span> /feature user-notifications</code></pre>
+
+        <h3>Složitější automatizační příkaz</h3>
+        <pre><code><span class="cm"># .claude/commands/deploy-check.md</span>
+Proveď předdeploymentní kontrolu:
+
+1. Spusť `npm run lint` – oprav všechny chyby
+2. Spusť `npm test` – všechny testy musí projít
+3. Zkontroluj, zda v kódu nejsou `console.log` nebo `debugger`
+4. Ověř, že `.env` není v gitu
+5. Zobraz `git diff main` pro finální review
+
+Pokud vše projde, vytvoř commit se zprávou "chore: pre-deploy checks passed".</code></pre>
+
+        <h3>Umístění vlastních příkazů</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Umístění</th><th>Dostupnost</th><th>Použití</th></tr></thead>
+            <tbody>
+              <tr><td><code>.claude/commands/</code></td><td>Pouze tento projekt</td><td>Projektoví specifické workflow</td></tr>
+              <tr><td><code>~/.claude/commands/</code></td><td>Všechny projekty</td><td>Osobní příkazy (deploy, review…)</td></tr>
+            </tbody>
+          </table>
+        </div>
 
         <div class="nav-bottom">
           <div id="nav-prev" class="nav-btn">
