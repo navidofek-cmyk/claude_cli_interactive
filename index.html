@@ -603,6 +603,18 @@ f9e8d7c6-b5a4-3210-fedc-ba9876543210  2026-05-01 09:15    ecommerce-api      23
               <tr><td><code>/vim</code></td><td>—</td><td>Přepne vstupní pole do vim módu</td></tr>
               <tr><td><code>/terminal-setup</code></td><td>—</td><td>Nakonfiguruje terminál pro správné zobrazení</td></tr>
               <tr><td><code>/bug</code></td><td>—</td><td>Otevře formulář pro nahlášení chyby Anthropicu</td></tr>
+              <tr><td><code>/fast</code></td><td>—</td><td>Přepne rychlý režim (Opus 4.6 s rychlejším výstupem)</td></tr>
+              <tr><td><code>/mcp</code></td><td>—</td><td>Správa MCP serverů za běhu sezení</td></tr>
+              <tr><td><code>/permissions</code></td><td>—</td><td>Přehled a úprava oprávnění nástrojů</td></tr>
+              <tr><td><code>/exit</code> / <code>/quit</code></td><td>—</td><td>Ukončení sezení</td></tr>
+              <tr><td><code>/resume</code></td><td>—</td><td>Obnovení předchozího sezení v interaktivním pickeru</td></tr>
+              <tr><td><code>/rewind</code></td><td>—</td><td>Vrátí konverzaci o N zpráv zpět</td></tr>
+              <tr><td><code>/ultrareview</code></td><td>—</td><td>Multi-agent cloud review větve nebo PR</td></tr>
+              <tr><td><code>/agents</code></td><td>—</td><td>Správa běžících a nakonfigurovaných agentů</td></tr>
+              <tr><td><code>/effort</code></td><td>—</td><td>Nastavení úrovně úsilí modelu (low → max)</td></tr>
+              <tr><td><code>/hooks</code></td><td>—</td><td>Přehled a správa hooků</td></tr>
+              <tr><td><code>/skills</code></td><td>—</td><td>Výpis dostupných skills (vlastní slash příkazů)</td></tr>
+              <tr><td><code>/remote-control</code></td><td>—</td><td>Vzdálené ovládání sezení přes SendMessage</td></tr>
             </tbody>
           </table>
         </div>
@@ -775,6 +787,134 @@ Akce:
 
         <h2>/bug – Nahlášení chyby</h2>
         <p>Otevře předvyplněný formulář pro nahlášení chyby přímo týmu Anthropic, včetně anonymizovaných diagnostických dat.</p>
+
+        <h2>/fast – Rychlý režim</h2>
+        <p>Přepíná rychlý režim pro Claude Opus 4.6 – stejný model, ale s rychlejším výstupem. Vhodné když potřebujete rychlé odpovědi na jednodušší otázky bez přepnutí na menší model.</p>
+        <pre><code><span class="var">Vy:</span> /fast
+<span class="str">Rychlý režim zapnut (Opus 4.6 fast output).</span>
+
+<span class="var">Vy:</span> /fast
+<span class="str">Rychlý režim vypnut.</span></code></pre>
+
+        <h2>/mcp – Správa MCP serverů</h2>
+        <p>Zobrazí a spravuje MCP (Model Context Protocol) servery za běhu sezení – výpis připojených serverů, jejich nástrojů a stavu připojení.</p>
+        <pre><code><span class="var">Vy:</span> /mcp
+
+<span class="str">Připojené MCP servery:
+  filesystem   ✓ připojen   12 nástrojů
+  github       ✓ připojen    8 nástrojů
+  postgres     ✗ odpojeno   chyba připojení</span></code></pre>
+        <p>Podrobná konfigurace MCP serverů je v sekci <strong>MCP Servery</strong>.</p>
+
+        <h2>/permissions – Správa oprávnění</h2>
+        <p>Zobrazí přehled všech oprávnění nástrojů v aktuálním projektu a umožní je upravit bez ruční editace <code>settings.json</code>.</p>
+        <pre><code><span class="var">Vy:</span> /permissions
+
+<span class="str">Oprávnění nástrojů:
+  Bash(git *)     ✓ povoleno
+  Bash(npm *)     ✓ povoleno
+  Bash(rm -rf *)  ✗ zakázáno
+  Edit            ✓ povoleno (jen src/)
+
+Akce: [1] Přidat  [2] Odebrat  [3] Konec</span></code></pre>
+
+        <h2>/exit a /quit – Ukončení</h2>
+        <p>Ukončí interaktivní sezení Claude Code. Ekvivalent stisknutí <kbd>Ctrl+D</kbd>. Sezení je uloženo a lze ho obnovit přes <code>/resume</code> nebo <code>claude --resume</code>.</p>
+        <pre><code><span class="var">Vy:</span> /exit
+<span class="str">Sezení uloženo. Na shledanou!</span></code></pre>
+
+        <h2>/resume – Obnovení sezení</h2>
+        <p>Otevře interaktivní picker předchozích sezení přímo uvnitř REPL. Alternativa k <code>claude --resume</code> při spuštění.</p>
+        <pre><code><span class="var">Vy:</span> /resume
+
+<span class="str">Předchozí sezení:
+  1. [dnes 14:32]   Refaktoring auth modulu
+  2. [dnes 09:15]   Oprava N+1 dotazů v billing
+  3. [včera 22:40]  Nová feature: notifikace
+
+Vyberte číslo nebo zadejte ID:</span></code></pre>
+
+        <h2>/rewind – Vrácení zpráv</h2>
+        <p>Odstraní poslední N zpráv z kontextu sezení a vrátí konverzaci o krok zpět. Užitečné když Claude odbočil špatným směrem.</p>
+        <pre><code><span class="var">Vy:</span> /rewind
+<span class="str">Vrácena 1 zpráva.</span>
+
+<span class="var">Vy:</span> /rewind 3
+<span class="str">Vráceny 3 zprávy. Kontext je nyní na stavu před nimi.</span></code></pre>
+
+        <h2>/ultrareview – Hloubkový review</h2>
+        <p>Spustí cloud-hosted multi-agent review aktuální větve nebo zadaného PR. Náročnější než <code>/review</code> – využívá více agentů paralelně pro hlubší analýzu.</p>
+        <pre><code><span class="var">Vy:</span> /ultrareview
+<span class="cm"># Review aktuální větve vs main</span>
+
+<span class="var">Vy:</span> /ultrareview 42
+<span class="cm"># Review GitHub PR #42</span>
+
+<span class="str">Spouštím cloud review (může trvat 2–5 minut)...
+  Agent 1: Bezpečnostní analýza
+  Agent 2: Výkonnostní audit
+  Agent 3: Kontrola testů a pokrytí
+  Agent 4: Architektonická konzistence
+✓ Review dokončeno – 7 nálezů</span></code></pre>
+
+        <h2>/agents – Správa agentů</h2>
+        <p>Zobrazí přehled běžících agentů na pozadí a nakonfigurovaných agentů. Umožňuje sledovat stav, výstup a zastavit agenty.</p>
+        <pre><code><span class="var">Vy:</span> /agents
+
+<span class="str">Běžící agenti:
+  #1  code-reviewer   běží   spuštěn před 2 min
+  #2  test-runner     hotov  0 chyb
+
+Nakonfigurovaní agenti:
+  reviewer, tester, deployer</span></code></pre>
+
+        <h2>/effort – Úroveň úsilí</h2>
+        <p>Nastavuje kolik „přemýšlení" věnuje model odpovědi. Vyšší úsilí = hlubší analýza, ale pomalejší odpověď a vyšší cena.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Úroveň</th><th>Použití</th></tr></thead>
+            <tbody>
+              <tr><td><code>low</code></td><td>Rychlé dotazy, jednoduché úkoly</td></tr>
+              <tr><td><code>medium</code></td><td>Standardní práce (výchozí)</td></tr>
+              <tr><td><code>high</code></td><td>Složité problémy, architektura</td></tr>
+              <tr><td><code>max</code></td><td>Nejtěžší problémy, dlouhé přemýšlení</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <pre><code><span class="var">Vy:</span> /effort high
+<span class="str">Úroveň úsilí nastavena na: high</span>
+
+<span class="var">Vy:</span> /effort low
+<span class="str">Úroveň úsilí nastavena na: low</span></code></pre>
+
+        <h2>/hooks – Přehled hooků</h2>
+        <p>Zobrazí všechny nakonfigurované hooky v aktuálním projektu a jejich stav. Alternativa k ruční editaci <code>settings.json</code>.</p>
+        <pre><code><span class="var">Vy:</span> /hooks
+
+<span class="str">Aktivní hooky:
+  PreToolUse   Bash    → scripts/safety-check.sh
+  PostToolUse  Edit    → scripts/format.sh
+  Stop                 → scripts/notify.sh</span></code></pre>
+
+        <h2>/skills – Dostupné skills</h2>
+        <p>Vypíše všechny dostupné skills – tedy vlastní slash příkazy definované v <code>.claude/commands/</code> nebo načtené pluginy.</p>
+        <pre><code><span class="var">Vy:</span> /skills
+
+<span class="str">Dostupné skills:
+  /testy         Spustí testovací suite
+  /deploy-check  Předdeploymentní kontrola
+  /feature       Vytvoří novou feature větev
+  /review        (vestavěný) Code review větve</span></code></pre>
+
+        <h2>/remote-control – Vzdálené ovládání</h2>
+        <p>Umožňuje ovládat sezení Claude Code vzdáleně přes <code>SendMessage</code> API – posílat zprávy do běžícího sezení z jiného procesu nebo skriptu.</p>
+        <pre><code><span class="var">Vy:</span> /remote-control
+
+<span class="str">Remote Control sezení: claude-session-abc123
+Čekám na vzdálené zprávy...
+
+Příkaz pro odeslání zprávy z jiného terminálu:
+  claude --send-to claude-session-abc123 "Spusť testy"</span></code></pre>
 
         <h2>Vlastní slash příkazy</h2>
         <p>Vytvořte soubory <code>.claude/commands/nazev.md</code> a budou dostupné jako <code>/nazev</code>. Název souboru = název příkazu.</p>
