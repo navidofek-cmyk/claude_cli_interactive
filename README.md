@@ -11,22 +11,26 @@ Od instalace po pokročilé multi-agent architektury.
 
 | # | Sekce | Téma |
 |---|-------|------|
-| 1 | Instalace | npm install, přihlášení, /doctor |
-| 2 | První kroky | REPL, typy promptů, schvalování akcí |
-| 3 | Slash příkazy | /compact, /clear, /init, vlastní příkazy |
-| 4 | Klávesové zkratky | Ctrl+C, schvalování y/n/a, history |
-| 5 | Nástroje | Bash, Read, Edit, Write, WebFetch, Agent |
-| 6 | CLAUDE.md | Šablona, globální vs. projektový soubor |
-| 7 | settings.json | Oprávnění, vzory povolení, env proměnné |
-| 8 | Hooks | PreToolUse, PostToolUse, Stop s příklady |
-| 9 | Agent Tool | Typy agentů, worktree izolace, parametry |
-| 10 | Nastavení agentů | Model, nástroje, šablona promptu, JSON výstup |
-| 11 | Paralelní agenti | Hub&Spoke, Map-Reduce, background agenti |
-| 12 | Multi-agent architektury | Pipeline, Tournament, Hierarchická síť |
-| 13 | Supervisor vzory | Critic-Reviser, Self-healing, Scrum board |
-| 14 | MCP Servery | Konfigurace, populární servery, vlastní server |
-| 15 | IDE Integrace | VS Code, JetBrains, /ide příkaz |
-| 16 | Tipy a triky | Best practices, časté chyby, výběr modelu |
+| 1 | Úvod | Přehled funkcí, co Claude Code umí |
+| 2 | Instalace | npm install, přihlášení, /doctor |
+| 3 | První kroky | REPL, typy promptů, schvalování akcí |
+| 4 | Obnovení sezení | --continue, --resume, SendMessage, aliasy |
+| 5 | Slash příkazy | 29 vestavěných příkazů + vlastní s $ARGUMENTS |
+| 6 | Klávesové zkratky | Ctrl+C, schvalování y/n/a, history |
+| 7 | Nástroje | Bash, Read, Edit, Write, WebFetch, Agent |
+| 8 | CLAUDE.md | Šablona, globální vs. projektový soubor |
+| 9 | settings.json | Oprávnění, vzory povolení, env proměnné |
+| 10 | Hooks | PreToolUse, PostToolUse, Stop s příklady |
+| 11 | Agent Tool | Typy agentů, worktree izolace, parametry |
+| 12 | Nastavení agentů | Model, nástroje, šablona promptu, JSON výstup |
+| 13 | Paralelní agenti | Hub&Spoke, Map-Reduce, background agenti |
+| 14 | Multi-agent architektury | Pipeline, Tournament, Hierarchická síť |
+| 15 | Supervisor vzory | Critic-Reviser, Self-healing, Scrum board |
+| 16 | MCP Servery | Konfigurace, populární servery, vlastní server |
+| 17 | IDE Integrace | VS Code, JetBrains, /ide příkaz |
+| 18 | Tipy a triky | Best practices, časté chyby, výběr modelu |
+
+---
 
 ## Technologie
 
@@ -35,6 +39,8 @@ Od instalace po pokročilé multi-agent architektury.
 - Responzivní sidebar navigace
 - Prohledávání sekcí
 - Tlačítka pro kopírování kódu
+- Progress bar při scrollování
+- Navigace Předchozí / Další na konci každé sekce
 
 ## Lokální spuštění
 
@@ -47,6 +53,6 @@ python -m http.server 8080
 
 ## GitHub Pages
 
-**Settings → Pages → Source: main / (root) → Save**
+Web je dostupný na:
 
-Web bude dostupný na `https://navidofek-cmyk.github.io/claude_cli_interactive`
+**https://navidofek-cmyk.github.io/claude_cli_interactive**
